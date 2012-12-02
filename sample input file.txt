@@ -1,0 +1,5 @@
+name: test simulation
+dir: C:/Simulation Directory/simulation
+maxRes: 64
+minRes: 32
+blockSize: 10
