@@ -4,9 +4,7 @@ PhotonMPIClass::PhotonMPIClass()
 {
 }
 
-PhotonMPIClass::~PhotonMPIClass()
-{
-}
+PhotonMPICla
 
 //Initailize MPI system. Call once, returns 1 if error, 0 otherwise.
 int PhotonMPIClass::initialize(int argc, char argv[])
@@ -58,3 +56,4 @@ int PhotonMPIClass::finalize()
 	
 	return errorFlag;
 }
+

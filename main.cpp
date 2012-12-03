@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <mpi.h>
 
 int main(int argc, char *argv[])
 {
@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 	//Initialize MPI
 	if(PhotonMPI.initialize(argc,argv))
 		printf("Error occured in MPI initialization.");
+	
 	
 	
 	printf("hello world. Rank = %d, Size = %d. \n", PhotonMPI.rank, PhotonMPI.size);

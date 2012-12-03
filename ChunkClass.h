@@ -23,6 +23,10 @@ public:
 	int *HxPtr; //Pointer to Hx array
 	int *HyPtr; //Pointer to Hy array
 	
+	
+	//Methods
+	int createMPIStruct();
+	
 };
 
 #endif // CHUNKCLASS_H

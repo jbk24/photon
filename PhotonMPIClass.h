@@ -22,7 +22,7 @@ public:
 	
 	int finalize(); //Terminates MPI system, other MPI cleanup, call once at end
 	
-	
+	int createMPIType(int count, int array_of_blocklengths[], int array )
 
 };
 
