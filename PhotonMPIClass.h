@@ -18,11 +18,11 @@ public:
 	
 	//Functions
 	
-	int initialize(int argc, char argv[]); //Initialize MPI system, call once at beginning
+	int initialize(int argc, char *argv[]); //Initialize MPI system, call once at beginning
 	
 	int finalize(); //Terminates MPI system, other MPI cleanup, call once at end
 	
-	int createMPIType(int count, int array_of_blocklengths[], int array )
+	int createMPIType(int count, int array_of_blocklengths[], int array );
 
 };
 

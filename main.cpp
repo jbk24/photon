@@ -1,5 +1,8 @@
 #include <stdio.h>
-#include <mpi.h>
+//#include <mpi.h>
+
+#include "PhotonMPIClass.h"
+
 
 int main(int argc, char *argv[])
 {

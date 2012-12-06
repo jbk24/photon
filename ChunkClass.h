@@ -1,6 +1,7 @@
 #ifndef CHUNKCLASS_H
 #define CHUNKCLASS_H
 /* This class describes individual "chunks" of the computational grid. Each processor will own more than one chunk*/
+#include <VectorIntClass.h>
 
 class ChunkClass
 {
