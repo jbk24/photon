@@ -16,7 +16,7 @@ int PhotonMPIClass::initialize(int argc, char *argv[])
 	int errorFlag = 0; //Flag to indicate error has occured
 
 	//Start MPI
-	ierr = MPI_Init (&argc, &rgv);	
+	ierr = MPI_Init (&argc, &argv);	
 	if(ierr != MPI_SUCCESS)
 	{
 		printf("MPI_Init error code: %d", ierr);

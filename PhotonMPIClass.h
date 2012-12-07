@@ -2,6 +2,7 @@
 #define PHOTONMPICLASS_H
 /*This class abstracts out calls to MPI, as well as storing MPI related data (rank, size etc. etc.) for use elsewhere*/
 
+#include <mpi.h>
 
 class PhotonMPIClass
 {

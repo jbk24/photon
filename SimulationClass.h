@@ -28,7 +28,17 @@ public:
 	//Run Properties
 	int maxT; //Maximum number of timesteps 
 	
+	//Functions
 	
+	void readControl(string filePath);//Read input control file
+
+private:
+
+
+	//List of possible fields
+	unsigned int field_index(string &s);
+
 };
 
 #endif // SIMULATIONCLASS_H
+

@@ -1,5 +1,5 @@
 #include <stdio.h>
-//#include <mpi.h>
+
 
 #include "PhotonMPIClass.h"
 
@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	
 	
 	
-	printf("hello world. Rank = %d, Size = %d. \n", PhotonMPI.rank, PhotonMPI.size);
+	printf("hello bruce. Rank = %d, Size = %d. \n", PhotonMPI.rank, PhotonMPI.size);
 	
 	
 	//Terminate MPI

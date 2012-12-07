@@ -1,0 +1,18 @@
+APPNAME=myapp
+
+OBJECTS= \
+	main.o \
+	PhotonMPIClass.o
+
+CPP=g++
+CPPFLAGS=-O2
+LD=g++
+LDFLAGS=
+
+all: $(APPNAME)
+
+$(APPNAME): $(OBJECTS)
+	$(LD) $(LDFLAGS) $(OBJECTS) -o $(APPNAME)
+
+%.o: %.cpp
+	$(CPP) $(CPPFLAGS) $^ -o $@
