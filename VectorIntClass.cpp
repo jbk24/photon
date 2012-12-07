@@ -1,10 +1,10 @@
 #include "VectorIntClass.h"
 
-VectorInt::VectorIntClass()
+VectorIntClass::VectorIntClass()
 {
 }
 
-VectorInt::~VectorIntClass()
+VectorIntClass::~VectorIntClass()
 {
 }
 

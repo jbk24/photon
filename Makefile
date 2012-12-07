@@ -4,7 +4,9 @@ MPIDIR=/usr/local/packages/openmpi/1.5.4/gcc4.7.2/lib
 
 OBJECTS= \
 	main.o \
-	PhotonMPIClass.o
+	VectorIntClass.o\
+	PhotonMPIClass.o \
+	SimulationClass.o \
 
 CPP=mpicc
 CPPFLAGS=-O2 -I$(MPIHOME)/include -I$(MPIDIR)
