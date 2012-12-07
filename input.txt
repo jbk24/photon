@@ -6,4 +6,5 @@ blockSize: 10
 cell: (20,40)
 maxT: 50
 freq: 32.5
+processors: (2,4)
 something wicked

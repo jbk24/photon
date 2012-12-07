@@ -27,7 +27,7 @@ void SimulationClass::readControl(string filePath)
 	
 	// the input file is read in line by line into string "line" until eof
 	string line;
-	ifstream inputFile ("input.txt");
+	ifstream inputFile (filePath.c_str());
 	if (inputFile.is_open())
 	{
 		while (!inputFile.eof())
@@ -48,7 +48,7 @@ void SimulationClass::readControl(string filePath)
 				}
 				case 1: //name, in string format
 				{
-					cout << field_data[0] << " = " << field_data[1] << endl;
+					name = field_data[1];
 					break;
 				}
 				case 2: //directory, in string format
@@ -56,49 +56,51 @@ void SimulationClass::readControl(string filePath)
 					//we need to add the directory back because the split function splits ":"
 					field_data[1].append(":");
 					field_data[1].append(field_data[2]);	
-					cout << field_data[0] << " = " << field_data[1] << endl;
+					dir = field_data[1];
 					break;
 				}
 				case 3: //maximum resolution, in integer format
 				{
-					int maxRes;
 					stringstream(field_data[1]) >> maxRes;
-					cout << field_data[0] << " = " << maxRes << endl;
 					break;
 				}
 				case 4: //minimum resolution, in integer format
 				{
-					int minRes;
 					stringstream(field_data[1]) >> minRes;
-					cout << field_data[0] << " = " << minRes << endl;
 					break;
 				}
 				case 5: //block size, in integer format
 				{
-					int blockSize;
 					stringstream(field_data[1]) >> blockSize;
-					cout << field_data[0] << " = " << blockSize << endl;
 					break;
 				}
 				case 6: //cell dimension, with x & y steps in (x,y) vector format, x & y are integers
 				{
-					cout << field_data[0] << " = " << field_data[1] << endl;
+					vector <string> xy;
+					split(xy, field_data[1], "(,)", split::no_empties);
+					stringstream(xy[0]) >> cell.x;
+					stringstream(xy[1]) >> cell.y;
 					break;
 				}				
 				case 7: //maximum time steps, in integer format
 				{
-					int maxT;
 					stringstream(field_data[1]) >> maxT;
-					cout << field_data[0] << " = " << maxT << endl;
 					break;					
 				}		
 				case 8: //maximum time steps, in integer format
 				{
-					double freq;
 					stringstream(field_data[1]) >> freq;
-					cout << field_data[0] << " = " << freq << endl;
 					break;					
-				}				
+				}
+				case 9: //number of processors in x and y directions, in vector (x,y) format
+				{
+					vector <string> xy;
+					split(xy, field_data[1], "(,)", split::no_empties);
+					stringstream(xy[0]) >> processors.x;
+					stringstream(xy[1]) >> processors.y;
+					break;
+				}
+					
 			}
 		}
 		inputFile.close();
@@ -120,6 +122,7 @@ unsigned int SimulationClass::field_index(string &s)
 		if (s == "cell")		return 6;		
 		if (s == "maxT")		return 7;
 		if (s == "freq")		return 8;
+		if (s == "processors")  return 9;
 		return 0;
 	
 }

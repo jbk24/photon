@@ -1,12 +1,12 @@
 #include <stdio.h>
-
+#include <iostream>
 #include "PhotonMPIClass.h"
 #include "SimulationClass.h"
 
 
 int main(int argc, char *argv[])
 {
-
+	
 	//Instantiate classes
 	PhotonMPIClass PhotonMPI;
 	SimulationClass Simulation;
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 	
 	
 	//Read input file
-	Simulation.readControl("");
+	Simulation.readControl(argv[argc-1]);
 	
 	//Terminate MPI
 	if(PhotonMPI.finalize())

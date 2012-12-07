@@ -25,9 +25,13 @@ public:
 	
 	//Computational Cell
 	VectorIntClass cell; //Size of global computational cell
+	VectorIntClass processors; //number of processors in x and y direcitons, must multiply to yield total number of cores
 	
 	//Run Properties
 	int maxT; //Maximum number of timesteps 
+	
+	//Source properties
+	double freq;
 	
 	//Functions
 	
