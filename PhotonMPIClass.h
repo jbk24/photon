@@ -14,7 +14,6 @@ public:
 	
 	int rank; //Rank of current process
 	int size; //Total number of processes in MPI_COMM_WORLD
-	int test;
 
 	
 	//Functions

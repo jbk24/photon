@@ -24,6 +24,11 @@ public:
 	int *HxPtr; //Pointer to Hx array
 	int *HyPtr; //Pointer to Hy array
 	
+	//Neighbors: rank of processor owning neighboring chunk. -1 if no chunk (cell boundary)
+	int north; 
+	int south;
+	int east;
+	int west;
 	
 	//Methods
 	int createMPIStruct();

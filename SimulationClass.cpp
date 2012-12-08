@@ -71,17 +71,20 @@ void SimulationClass::readControl(string filePath)
 				}
 				case 5: //block size, in integer format
 				{
-					stringstream(field_data[1]) >> blockSize;
+					vector <string> xy;
+					split(xy, field_data[1], "(,)", split::no_empties);
+					stringstream(xy[0]) >> chunkSize.x;
+					stringstream(xy[1]) >> chunkSize.y;
 					break;
 				}
-				case 6: //cell dimension, with x & y steps in (x,y) vector format, x & y are integers
+				case 6: //global cell dimension, with x & y steps in (x,y) vector format, x & y are integers
 				{
 					vector <string> xy;
 					split(xy, field_data[1], "(,)", split::no_empties);
-					stringstream(xy[0]) >> cell.x;
-					stringstream(xy[1]) >> cell.y;
+					stringstream(xy[0]) >> cellGlobal.x;
+					stringstream(xy[1]) >> cellGlobal.y;
 					break;
-				}				
+				}			
 				case 7: //maximum time steps, in integer format
 				{
 					stringstream(field_data[1]) >> maxT;
@@ -104,9 +107,17 @@ void SimulationClass::readControl(string filePath)
 			}
 		}
 		inputFile.close();
+		
+		// Compute dependant quantities from input data
+		cellLocal.x = cellGlobal.x/processors.x;
+		cellLocal.y = cellGlobal.y/processors.y;
+		
+		//Compute number of x and y chunks
+		int numChunks.x = Simulation.cellGlobal.x/Simulation.chunkSize.x;
+		int numChunks.y = Simulation.cellGlobal.y/Simulation.chunkSize.y;
+		
 	}
 	else cout << "Can't open input file.\n";
-	
 	
 }
 
@@ -118,11 +129,12 @@ unsigned int SimulationClass::field_index(string &s)
 		if (s == "dir")			return 2;
 		if (s == "maxRes")		return 3;
 		if (s == "minRes")		return 4;
-		if (s == "blockSize")	return 5;
-		if (s == "cell")		return 6;		
+		if (s == "chunkSize")	return 5;
+		if (s == "cellGlobal")	return 6;
 		if (s == "maxT")		return 7;
 		if (s == "freq")		return 8;
 		if (s == "processors")  return 9;
+
 		return 0;
 	
 }

@@ -1,16 +1,12 @@
 #include <stdio.h>
 #include <iostream>
-#include "PhotonMPIClass.h"
-#include "SimulationClass.h"
+#include "global.h"
 
 
 int main(int argc, char *argv[])
 {
 	
-	//Instantiate classes
-	PhotonMPIClass PhotonMPI;
-	SimulationClass Simulation;
-	
+
 	//Create map of chunks
 	//ChunkClass chunkMap[rows][cols];
 	

@@ -21,10 +21,12 @@ public:
 	//Mesh
 	int maxRes; //Maximum mesh resolution, points per unit
 	int minRes; //Minimum mesh resolution, points per unit
-	int blockSize; //Size of grid chunks
+	VectorIntClass chunkSize; //Size of grid chunks
+	VectorIntClass numChunks; //Number of grid chunks in x and y directions
 	
 	//Computational Cell
-	VectorIntClass cell; //Size of global computational cell
+	VectorIntClass cellGlobal; //Size of global computational cell, in grid points
+	VectorIntClass cellLocal; //Size of local cell at each processor, in grid points
 	VectorIntClass processors; //number of processors in x and y direcitons, must multiply to yield total number of cores
 	
 	//Run Properties
