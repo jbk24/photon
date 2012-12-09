@@ -1,15 +1,30 @@
+#include "global.h"
+#include "utilities.h"
+#include <stdio.h>
+
 PhotonMPIClass PhotonMPI;
 SimulationClass Simulation;
-	
-#include "utilities.h"
+ChunkClass *ChunkMap;
 	
 //Instantiate chunk map 
-void instantiateChunkMap()
+int instantiateChunkMap()
 {
-
 	//Instantiate array of ChunkClass of size xChunks by yChunks
-	ChunkClass ChunkMap[Simulation.numChunks.x][Simulation.numChunks.y];
+	ChunkMap = new ChunkClass[Simulation.numChunks.x*Simulation.numChunks.y];
+	printf("\n%u\n",ChunkMap[3].refinement);
 	
 	//Initialize chunkMap by defining chunk neighbors
-	updateChunkMap();
+	initializeChunkMap();
+
+	//Update chunk bounds for this processor
+	updateChunkBounds();
+	
+	return 0; //No error handling yet
+}
+
+//Perform all cleanup actions for variables allocated on the heap
+void globalCleanUp()
+{
+	//Chunk Map
+	//delete [] ChunkMap;
 }

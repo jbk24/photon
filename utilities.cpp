@@ -1,8 +1,9 @@
 /*This file contains functions for background operations not directly associated with any class */
-#include global.h
+#include "global.h"
+#include "utilities.h"
 
-//Build or rebuild map of which processor a given chunk resides on
-void initalizeChunkMap()
+//Build map of which processor a given chunk resides on
+void initializeChunkMap()
 {
 	//Loop over chunk map
 	for(int x = 0; x<Simulation.numChunks.x; x++)
@@ -10,43 +11,53 @@ void initalizeChunkMap()
 		for(int y = 0; y<Simulation.numChunks.y; y++)
 		{
 			int processorX = x%Simulation.numChunks.x; //X position of current processor
-			int processorY = y%Simulation.numChunks.y;S; //Y position of current processor
-			ChunkMap[x][y].processor = xy2gid(processorX, processorY, Simulation.processors.x); //get rank of processor
+			int processorY = y%Simulation.numChunks.y; //Y position of current processor
+			ChunkMap[xy2gid(x,y,Simulation.numChunks.x)].processor = xy2gid(processorX, processorY, Simulation.processors.x); //get rank of processor
 		}
 	}
 }
 
-void updateChunkMap()
+void updateChunkBounds() //Get min x,y and max x,y chunk for processor
 {
+	int minX,minY,maxX,maxY; //Cooridnates of box bounding chunks for current processor  
+	bool noChunksFound = true; //flag to indicate first chunk has been found and bounding box coordinates initialized
 	//Loop over chunk map
 	for(int x = 0; x<Simulation.numChunks.x; x++)
 	{
 		for(int y = 0; y<Simulation.numChunks.y; y++)
 		{
-			/*FIX THIS CODE*/
-			
-			int processorX = x%Simulation.numChunks.x; //X position of current processor
-			int processorY = y%Simulation.numChunks.y;S; //Y position of current processor
-			ChunkMap[x][y].processor = xy2gid(processorX, processorY, Simulation.processors.x); //get rank of processor
+			if(ChunkMap[xy2gid(x,y,Simulation.numChunks.x)].processor == PhotonMPI.rank) //Check if current chunk resides on this processor
+			{
+				//Check if this is the first chunk we have found
+				if(noChunksFound)
+				{
+					minX = x;
+					minY = y;
+					maxX = x;
+					maxY = y;
+					noChunksFound = false;
+				}
+				else
+				{
+					//Update minX
+					if(x<minX)
+						minX = x;
+					if(y<minY)
+						minY = y;
+					if(x>maxX)
+						maxX = x;
+					if(y>maxY)
+						maxY = y;
+				}
+			}
+					
 		}
 	}
+	//Update bounding box cooridnates in simulation
+	Simulation.minChunk.x = minX;
+	Simulation.minChunk.y = minY;
+	Simulation.maxChunk.x = maxX;
+	Simulation.maxChunk.y = maxY;
 	
-}
-
-
-int gid2x(int gid, int sizeX) //Convert gid (such as processor rank) to x position, using the size of the array in the x direction
-{
-	return gid%sizeX; //y
-}
-
-int gid2y(int gid, int sizeX) //Convert gid (such as processor rank) to y position, using the size of the array in the x direction
-{
-	int y = gid%x;
-	return gid - y*sizeX; //x
-}
-
-int xy2gid(int x, int y, int sizeX) //Convert x-y position to gid (such as processor rank), using the size of the array in the x direction
-{
-	return y*sizeX + x; //gid
 }
 

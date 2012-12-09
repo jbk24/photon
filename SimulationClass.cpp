@@ -69,7 +69,7 @@ void SimulationClass::readControl(string filePath)
 					stringstream(field_data[1]) >> minRes;
 					break;
 				}
-				case 5: //block size, in integer format
+				case 5: //chunk size, in in (x,y) vector format
 				{
 					vector <string> xy;
 					split(xy, field_data[1], "(,)", split::no_empties);
@@ -113,8 +113,8 @@ void SimulationClass::readControl(string filePath)
 		cellLocal.y = cellGlobal.y/processors.y;
 		
 		//Compute number of x and y chunks
-		int numChunks.x = Simulation.cellGlobal.x/Simulation.chunkSize.x;
-		int numChunks.y = Simulation.cellGlobal.y/Simulation.chunkSize.y;
+		numChunks.x = cellGlobal.x/chunkSize.x;
+		numChunks.y = cellGlobal.y/chunkSize.y;
 		
 	}
 	else cout << "Can't open input file.\n";

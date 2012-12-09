@@ -21,8 +21,10 @@ public:
 	//Mesh
 	int maxRes; //Maximum mesh resolution, points per unit
 	int minRes; //Minimum mesh resolution, points per unit
-	VectorIntClass chunkSize; //Size of grid chunks
+	VectorIntClass chunkSize; //Initial size of grid chunks, will change under AMR
 	VectorIntClass numChunks; //Number of grid chunks in x and y directions
+	VectorIntClass minChunk; //Upper left cooordinates (minimum) of rectangular box bounding all chunks owned by this processor
+	VectorIntClass maxChunk; //Lower right cooordinates (maximum) of rectangular box bounding all chunks owned by this processor
 	
 	//Computational Cell
 	VectorIntClass cellGlobal; //Size of global computational cell, in grid points

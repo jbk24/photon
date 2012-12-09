@@ -7,8 +7,9 @@
 
 extern PhotonMPIClass PhotonMPI;
 extern SimulationClass Simulation;
-extern ChunkClass ChunkMap[][];
+extern ChunkClass* ChunkMap; //Pointer to map of chunks, uses linear indexing
 
-void instantiateChunkMap(); //Initalize chunk map with processor ranks
+int instantiateChunkMap(); //Initalize chunk map with processor ranks
+void globalCleanUp(); //Perform all cleanup actions for variables allocated on the heap
 
 #endif //GLOBAL_H

@@ -1,4 +1,5 @@
 #include "PhotonMPIClass.h"
+#include <mpi.h>
 
 PhotonMPIClass::PhotonMPIClass()
 {

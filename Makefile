@@ -7,6 +7,10 @@ OBJECTS= \
 	VectorIntClass.o\
 	PhotonMPIClass.o \
 	SimulationClass.o \
+	ChunkClass.o \
+	global.o \
+	utilities.o \
+	csvFileIO.o \
 
 CPP=mpicc
 CPPFLAGS=-O2 -I$(MPIHOME)/include -I$(MPIDIR)
