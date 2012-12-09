@@ -10,8 +10,8 @@ void initializeChunkMap()
 	{
 		for(int y = 0; y<Simulation.numChunks.y; y++)
 		{
-			int processorX = x%Simulation.numChunks.x; //X position of current processor
-			int processorY = y%Simulation.numChunks.y; //Y position of current processor
+			int processorX = x/(Simulation.numChunks.x/Simulation.processors.x); //X position of current processor
+			int processorY = y/(Simulation.numChunks.y/Simulation.processors.y); //Y position of current processor
 			ChunkMap[xy2gid(x,y,Simulation.numChunks.x)].processor = xy2gid(processorX, processorY, Simulation.processors.x); //get rank of processor
 		}
 	}

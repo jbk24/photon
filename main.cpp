@@ -9,34 +9,36 @@ int main(int argc, char *argv[])
 	
 	//Initialize MPI
 	if(PhotonMPI.initialize(argc,argv))
-		printf("Error occured in MPI initialization.");
+		cout << "Error occured in MPI initialization.";
 	
 	//Read input file
 	Simulation.readControl(argv[argc-1]);
 	
 	//Create map of chunks
 	if(instantiateChunkMap())
-		printf("Error occured in chunk map initialization.");
+		cout << "Rank: " << PhotonMPI.rank << "Error occured in chunk map initialization.\n";
 	
-	cout << "X chunks: "<< Simulation.numChunks.x << "\n";
-	cout << "Y chunks: "<< Simulation.numChunks.y << "\n";
-	
-	
+	//Write chunk map if rank 0
+	if(PhotonMPI.rank == 0)
+	{
+		if(writeChunkMapCSV())
+			cout << "Rank: " << PhotonMPI.rank << "Error occured in writing chunk map files.\n";
+	}
 	
 	//Read epsilon and sigma
-	readEpsSigmaCSV();
+	if(readEpsSigmaCSV())
+		cout << "Rank: " << PhotonMPI.rank << " Error in reading CSV file.\n";
 	
 	
-	//printf("hello bruce. Rank = %d, Size = %d. \n", PhotonMPI.rank, PhotonMPI.size);
 	
-	
+
 
 	//Perform global cleanup
 	globalCleanUp();
 	
 	//Terminate MPI
 	if(PhotonMPI.finalize())
-		printf("Error occured in MPI finalize.");
+		cout << "Rank: " << PhotonMPI.rank << "Error occured in MPI finalize.\n";
 	
 	return 0;
 	

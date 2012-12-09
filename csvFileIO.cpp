@@ -125,7 +125,10 @@ int readEpsSigmaCSV()
 		eCsv.close();
 		zCsv.close();
 	}
-	else cout << "Can't open one of the csv files.\n";
+	else {
+		cout << "Can't open one of the csv files.\n";
+		return 1;
+	}
 
 	//the following outputs the result in a per chunk basis, I hope it is easy to understand...	
 	cout << "E & Z local CSV with Rank = " << PhotonMPI.rank << endl;
@@ -137,8 +140,11 @@ int readEpsSigmaCSV()
 		for (unsigned int j = 0; j < chunkY; j++)	// stepping y chunk
 		{
 			locCx = locGx/Simulation.chunkSize.x;		// same procedure to comput chunk ID
-			locCy = locGy/Simulation.chunkSize.y;		
-			cout << "Chunk ID : (" << locCx << "," << locCy << ")\n";
+			locCy = locGy/Simulation.chunkSize.y;
+
+			if(locCx == 5 && locCy == 2)
+			{
+			cout << "\n\nChunk ID : (" << locCx << "," << locCy << ")\n";
 			cout << "Epsilon map: " << endl;
 			//simple writing back loop, can be used later for WriteCsv.cpp
 			for (unsigned int x = 0; x < Simulation.chunkSize.x; x++)	// unfortunately two nested for loops are needed for E & Z
@@ -158,10 +164,50 @@ int readEpsSigmaCSV()
 				}
 				cout << endl;
 			}
+			}
 			locGy += Simulation.chunkSize.y;	// notice we are stepping by number of grids per chunk, makes sense right?
+		
+		
 		}
 		locGx += Simulation.chunkSize.x;
 	}
 	 
 	return 0;
+}
+
+
+int writeChunkMapCSV()
+{
+
+	//Open files
+	ofstream procMap ("ChunkMapProcessors.csv"); //Map of grid chunk processors
+	ofstream refineMap ("ChunkMapRefinement.csv"); //Map of grid chunk refinement
+	
+	//Check if files are open
+	if(procMap.is_open() && refineMap.is_open())
+	{
+		for(int x = 0; x < Simulation.numChunks.x; x++) // Loop over x (rows in file)
+		{
+			for(int y = 0; y < Simulation.numChunks.y; y++) //Loop over y (columns in file)
+			{
+				procMap << ChunkMap[xy2gid(x,y,Simulation.numChunks.x)].processor;
+				refineMap << ChunkMap[xy2gid(x,y,Simulation.numChunks.x)].refinement;
+				if(y < (Simulation.numChunks.y - 1)) // Don't write "," on last column
+					procMap << ",";
+					refineMap << ",";
+			}
+			//Go to next line
+			procMap << endl;
+			refineMap << endl;
+		}
+	
+	}
+	else return 1; //Error in opening files
+	
+	//Close files
+	procMap.close();
+	refineMap.close();
+	
+	return 0;
+	
 }
