@@ -31,6 +31,30 @@ int main(int argc, char *argv[])
 	if(readEpsSigmaCSV())
 		cout << "Rank: " << PhotonMPI.rank << " Error in reading CSV file.\n";
 	
+	//Test MPI comm address
+	if(PhotonMPI.rank == 0)
+	{
+		//Override to just do one comm
+		PhotonMPI.edgeCount = 1;
+		PhotonMPI.symChunkCommInit();
+		PhotonMPI.symChunkComm(ChunkMap[xy2gid(5,0,Simulation.numChunks.x)].eps, ChunkMap[xy2gid(5,0,Simulation.numChunks.x)].sigma, Simulation.chunkSize.x*Simulation.chunkSize.y, xy2gid(5,0,Simulation.numChunks.x), xy2gid(6,0,Simulation.numChunks.x));
+		cout << "Messages Queued" << endl;
+		PhotonMPI.symChunkCommWait();
+		writeArraytoCSV(ChunkMap[xy2gid(5,0,Simulation.numChunks.x)].eps, Simulation.chunkSize.x, Simulation.chunkSize.y, "rank0 sent eps.csv");
+	}
+	
+	if(PhotonMPI.rank == 1)
+	{
+		//Override to just do one comm
+		PhotonMPI.edgeCount = 1;
+		PhotonMPI.symChunkCommInit();
+		PhotonMPI.symChunkComm(ChunkMap[xy2gid(6,0,Simulation.numChunks.x)].eps, ChunkMap[xy2gid(6,0,Simulation.numChunks.x)].sigma, Simulation.chunkSize.x*Simulation.chunkSize.y, xy2gid(6,0,Simulation.numChunks.x), xy2gid(5,0,Simulation.numChunks.x));
+		cout << "Messages Queued" << endl;
+		PhotonMPI.symChunkCommWait();
+		writeArraytoCSV(ChunkMap[xy2gid(6,0,Simulation.numChunks.x)].sigma, Simulation.chunkSize.x, Simulation.chunkSize.y, "rank1 recv eps.csv");
+	}
+	
+	
 	//Write field array
 	if(PhotonMPI.rank == 0)
 	{

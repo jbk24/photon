@@ -143,7 +143,7 @@ int readEpsSigmaCSV()
 			locCx = locGx/Simulation.chunkSize.x;		// same procedure to comput chunk ID
 			locCy = locGy/Simulation.chunkSize.y;
 
-			if(locCx == 5 && locCy == 2)
+			if(locCx == 0 && locCy == 5)
 			{
 			cout << "\n\nChunk ID : (" << locCx << "," << locCy << ")\n";
 			cout << "Epsilon map: " << endl;

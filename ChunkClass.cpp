@@ -7,6 +7,12 @@ ChunkClass::ChunkClass()
 	//Initialize chunk class parameters
 	refinement = 1;
 	
+	//Initalize all edges to PEC boundary, no comm (0)
+	edgeXn = 0;
+	edgeXp = 0;
+	edgeYn = 0;
+	edgeYp = 0;
+	
 	//Instantiate arrays
 	eps = new double[Simulation.chunkSize.x*Simulation.chunkSize.y]();
 	sigma = new double[Simulation.chunkSize.x*Simulation.chunkSize.y]();

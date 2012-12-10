@@ -17,7 +17,10 @@ int instantiateChunkMap()
 	initializeChunkMap();
 
 	//Update chunk bounds for this processor
-	updateChunkBounds();
+	updateChunkList();
+	
+	//Build ChunkMap MPI Tags
+	PhotonMPI.allocateChunkTags();
 	
 	return 0; //No error handling yet
 }

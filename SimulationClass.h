@@ -4,6 +4,7 @@
 
 #include <string>
 #include "VectorIntClass.h"
+#include <vector>
 using namespace std;
 
 class SimulationClass
@@ -21,10 +22,11 @@ public:
 	//Mesh
 	int maxRes; //Maximum mesh resolution, points per unit
 	int minRes; //Minimum mesh resolution, points per unit
+	
+	//Chunks
 	VectorIntClass chunkSize; //Initial size of grid chunks, will change under AMR
 	VectorIntClass numChunks; //Number of grid chunks in x and y directions
-	VectorIntClass minChunk; //Upper left cooordinates (minimum) of rectangular box bounding all chunks owned by this processor
-	VectorIntClass maxChunk; //Lower right cooordinates (maximum) of rectangular box bounding all chunks owned by this processor
+	vector<int> ownedChunkList; //List of gid of chunks owned by current processor, length and constituents will change under AMR
 	
 	//Computational Cell
 	VectorIntClass cellGlobal; //Size of global computational cell, in grid points
