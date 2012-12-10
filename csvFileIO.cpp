@@ -13,6 +13,7 @@ using std::endl;
 using std::ifstream;
 #include <cstring>
 #include <string>
+//using std::string
 #include <sstream>
 using namespace std;
 #include <vector>
@@ -200,7 +201,6 @@ int writeChunkMapCSV()
 			procMap << endl;
 			refineMap << endl;
 		}
-	
 	}
 	else return 1; //Error in opening files
 	
@@ -209,5 +209,36 @@ int writeChunkMapCSV()
 	refineMap.close();
 	
 	return 0;
-	
 }
+
+
+int writeArraytoCSV(double *array, int sizeX, int sizeY, string fileName)// Write an array to a CSV file
+{
+	//Open file
+	ofstream file; //CSV file
+	file.open(fileName.c_str());
+	
+	//Check if file is open
+	if(file.is_open())
+	{
+		for(int x = 0; x < sizeX; x++) // Loop over x (rows in file)
+		{
+			for(int y = 0; y < sizeY; y++) //Loop over y (columns in file)
+			{
+				file << array[xy2gid(x,y,sizeX)];
+				
+				if(y < (sizeY - 1)) // Don't write "," on last column
+					file << ",";
+			}
+			//Go to next line
+			file << endl;
+		}
+	}
+	else return 1; //Error in opening files
+	
+	//Close files
+	file.close();
+	
+	return 0;
+}
+

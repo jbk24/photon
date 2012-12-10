@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <iostream>
+#include <string.h>
 #include "global.h"
 #include "utilities.h"
 #include "csvFileIO.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -29,9 +31,13 @@ int main(int argc, char *argv[])
 	if(readEpsSigmaCSV())
 		cout << "Rank: " << PhotonMPI.rank << " Error in reading CSV file.\n";
 	
+	//Write field array
+	if(PhotonMPI.rank == 0)
+	{
+		if(writeArraytoCSV(ChunkMap[xy2gid(0,0,Simulation.numChunks.x)].eps,(Simulation.chunkSize.x), (Simulation.chunkSize.y), "Chunk00Eps.csv"))
+			cout << "Rank: " << PhotonMPI.rank << " Error in writing CSV file.\n";
+	}
 	
-	
-
 
 	//Perform global cleanup
 	globalCleanUp();
