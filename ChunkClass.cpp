@@ -13,15 +13,28 @@ ChunkClass::ChunkClass()
 	edgeYn = 0;
 	edgeYp = 0;
 	
-	//Instantiate arrays
-	eps = new double[Simulation.chunkSize.x*Simulation.chunkSize.y]();
-	sigma = new double[Simulation.chunkSize.x*Simulation.chunkSize.y]();
+	//Instantiate arrays--larger by 2 elements in each direction for overlap with adjacent chunks to facilitate FDTD
 	
-	//Field arrays--larger by 2 elements in each direction for overlap with adjacent chunks to facilitate FDTD
-	Ez = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	//Geometry
+	epsilon = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	sigmaX = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	sigmaY = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	
+	//Field arrays
+	Ezx = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	Ezy = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
 	Hx = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
 	Hy = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
 	
+	//Prefactors
+	PFA_Ezx = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	PFB_Ezx = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	PFA_Ezy = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	PFB_Ezy = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	PFA_Hx = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	PFB_Hx = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	PFA_Hy = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
+	PFB_Hy = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
 }
 
 ChunkClass::~ChunkClass()
@@ -67,5 +80,10 @@ int ChunkClass::createMPIStruct()
 	*/
 	
 	return 0;
+	
+}
+
+int ChunkClass::computePrefactors() //Compute FDTD timestepping prefactors from constants
+{
 	
 }

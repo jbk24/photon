@@ -27,18 +27,31 @@ public:
 	int edgeYn; //Condition on negative-y edge
 	int edgeYp; //Condition on positive-y edge
 	
-	//Arrays: 
-	//Eps and sigma arrays are of size "size.x*size.y*refinement", as above
-	double *eps; //Pointer to epsilon array
-	double *sigma; //Pointer to sigma array
+	//Arrays: arrays are of (size.x+2)(size.y+2)*refinement, for overlap with adjacent arrays
+	//Eps and sigma arrays
+	double *epsilon; //Pointer to epsilon array
+	double *sigmaX; //Pointer to sigmaX array
+	double *sigmaY; //Pointer to sigmaY array
 	
-	//Ex, Hx, Hy arrays are of (size.x+2)(size.y+2)*refinement, for overlap with adjacent arrays
-	double *Ez; //Pointer to Ez array
+	//Ex, Hx, Hy 
+	double *Ezx; //Pointer to Ezx array Ez = Ezx + Ezy
+	double *Ezy; //Pointer to Ezy array
 	double *Hx; //Pointer to Hx array
 	double *Hy; //Pointer to Hy array
 	
+	//Prefactor arrays--compute these once at start of simulation, recompute for any refined cells duing simultion
+	double *PFA_Ezx; 
+	double *PFB_Ezx;
+	double *PFA_Ezy;
+	double *PFB_Ezy;
+	double *PFA_Hx;
+	double *PFB_Hx;
+	double *PFA_Hy;
+	double *PFB_Hy;
+	
 	//Methods
 	int createMPIStruct();
+	int computePrefactors(); //Compute FDTD timestepping prefactors from constants
 	
 };
 

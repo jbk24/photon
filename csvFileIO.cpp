@@ -61,14 +61,22 @@ int readEpsSigmaCSV()
 	const int rowSkip = gid2x(PhotonMPI.rank,Simulation.processors.x)*Simulation.cellLocal.x;		//Number of grid rows to skip until reaching processor row
 		
 	// the csv file xCsv is read line-by-line into string "xLine" until eof
-	string eLine;
-	string zLine;
-	ifstream eCsv ("epsilon.csv");
-	ifstream zCsv ("sigma.csv");
-	vector <string> eRow;
-	vector <string> zRow;
-	double eDouble;
-	double zDouble;
+	string epsilon_line;
+	string sigmaX_line;
+	string sigmaY_line;
+	
+	ifstream epsilon_CSV ("epsilon.csv");
+	ifstream sigmaX_CSV ("sigmaX.csv");
+	ifstream sigmaY_CSV ("sigmaY.csv");
+	
+	vector <string> epsilon_row;
+	vector <string> sigmaX_row;
+	vector <string> sigmaY_row;
+	
+	double epsilon_double;
+	double sigmaX_double;
+	double sigmaY_double;
+	
 	int locGx = 0;			    // x location of global grid in the loop
 	int locGy = 0;				// y location of global grid in the loop
 	int locCx;					// x location of chunk wrt global x
@@ -76,25 +84,30 @@ int readEpsSigmaCSV()
 	int locX;					// x location within chunk
 	int locY;					// y location within chunk
 	
-	if (eCsv.is_open() && zCsv.is_open())
+	if (epsilon_CSV.is_open() && sigmaX_CSV.is_open() && sigmaY_CSV.is_open())
 	{
-		while (eCsv.good() && zCsv.good())
+		while (epsilon_CSV.good() && sigmaX_CSV.good() && sigmaY_CSV.good())
 		{
 			if (locGx < rowSkip) //skip rows prior to processor
 			{
 				locGx++;
-				getline (eCsv, eLine); //get lineE and go to next, but just dump it!
-				getline (zCsv, zLine); //get lineZ and go to next, but just dump it!
+				getline (epsilon_CSV, sigma_line); //get sigma line and go to next, but just dump it!
+				getline (sigmaX_CSV, sigmaX_line); //get sigmaX line and go to next, but just dump it!
+				getline (sigmaY_CSV, sigmaY_line); //get sigmaY line and go to next, but just dump it!
+				
 			}
 			else //read row
 			{	
 				if (locGx < (rowSkip + Simulation.cellLocal.x))	// step through rows of interest for the processor
 					{
-					getline (eCsv, eLine);
-					getline (zCsv, zLine);
+					getline (epsilon_CSV, epsilon_line)
+					getline (sigmaX_CSV, sigmaX_line);
+					getline (sigmaY_CSV, sigmaY_line);
+					
 					//Split each line by ",".
-					split( eRow, eLine, ",", split::no_empties );
-					split( zRow, zLine, ",", split::no_empties );
+					split( epsilon_row, epsilon_line, "," split::no_empties )
+					split( sigmaX_row, sigmaX_line, ",", split::no_empties );
+					split( sigmaY_row, sigmaY_line, ",", split::no_empties );
 					
 					locCx = locGx/Simulation.chunkSize.x;	// x location of chunk is globalx location / x size of chunk
 					locX  = locGx%Simulation.chunkSize.x;	// x location within chunk is global x location % x size of chunk
@@ -106,10 +119,12 @@ int readEpsSigmaCSV()
 							locCy = locGy/Simulation.chunkSize.y;	// same logic as locCx
 							locY  = locGy%Simulation.chunkSize.y;	// same logic as locX
 							
-							stringstream(eRow[locGy]) >> eDouble;
-							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].eps[xy2gid(locX,locY,Simulation.chunkSize.x)] = eDouble;
-							stringstream(zRow[locGy]) >> zDouble;
-							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigma[xy2gid(locX,locY,Simulation.chunkSize.x)]=zDouble;				
+							stringstream(epsilon_row[locGy]) >> epsilon_double;
+							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].epsilon[xy2gid(locX,locY,Simulation.chunkSize.x)]= epsilon_double;				
+							stringstream(sigmaX_row[locGy]) >> sigmaX_double;
+							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaX[xy2gid(locX,locY,Simulation.chunkSize.x)] = sigmaX_double;
+							stringstream(sigmaY_row[logGy]) >> sigmaY_double;
+							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaY[xy2gid(locX,locY,Simulation.chunkSize.x)] = sigmaY_double;
 							locGy++;
 						} 
 					locGx++;
@@ -117,8 +132,9 @@ int readEpsSigmaCSV()
 				else	break;
 			}				
 		}
-		eCsv.close();
-		zCsv.close();
+		epsilon_CSV.close();
+		sigmaX_CSV.close();
+		sigmaY_CSV.close();
 	}
 	
 	else {

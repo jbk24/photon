@@ -12,7 +12,7 @@
  //Timestepping
 	for(Simulation.curT = 0; Simulation.curT<Simulation.maxT; Simulation.curT++)
 	{
-		//Initialize comm system for current timestep
+		//Initialize comm system for E update
 		PhotonMPI.chunkCommInit();
 	 
 		//Update E field from H field at curT
@@ -21,6 +21,9 @@
 		//Wait for all E field comm to complete
 		PhotonMPI.chunkCommWait();
 	 
+	 
+		//Initialize comm system for H update
+		PhotonMPI.chunkCommInit();
 	 
 		//Update H field from E field at curT + 1/2
 		update_H_from_E();
