@@ -119,12 +119,13 @@ int readEpsSigmaCSV()
 							locCy = locGy/Simulation.chunkSize.y;	// same logic as locCx
 							locY  = locGy%Simulation.chunkSize.y;	// same logic as locX
 							
+							//Write into locX+1, locY+1 b/c arrays are size 2 larger than actual chunk for overlap
 							stringstream(epsilon_row[locGy]) >> epsilon_double;
-							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].epsilon[xy2gid(locX,locY,Simulation.chunkSize.x)]= epsilon_double;				
+							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].epsilon[xy2gid(locX+1,locY+1,Simulation.chunkSize.x)]= epsilon_double;				
 							stringstream(sigmaX_row[locGy]) >> sigmaX_double;
-							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaX[xy2gid(locX,locY,Simulation.chunkSize.x)] = sigmaX_double;
+							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaX[xy2gid(locX+1,locY+1,Simulation.chunkSize.x)] = sigmaX_double;
 							stringstream(sigmaY_row[logGy]) >> sigmaY_double;
-							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaY[xy2gid(locX,locY,Simulation.chunkSize.x)] = sigmaY_double;
+							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaY[xy2gid(locX+1,locY+1,Simulation.chunkSize.x)] = sigmaY_double;
 							locGy++;
 						} 
 					locGx++;

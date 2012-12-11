@@ -36,6 +36,9 @@ public:
 	//Run Properties
 	int maxT; //Maximum number of timesteps 
 	int curT; //Current timestep
+	double deltaT; //delta T for timestepping
+	double deltaX; //delta X for timestepping
+	double deltaY; //delta Y for timestepping
 	
 	//Source properties
 	double freq;

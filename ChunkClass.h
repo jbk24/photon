@@ -1,6 +1,7 @@
 #ifndef CHUNKCLASS_H
 #define CHUNKCLASS_H
 /* This class describes individual "chunks" of the computational grid. Each processor will own more than one chunk*/
+#include "VectorIntClass.h"
 
 class ChunkClass
 {
@@ -29,6 +30,8 @@ public:
 	
 	//Arrays: arrays are of (size.x+2)(size.y+2)*refinement, for overlap with adjacent arrays
 	//Eps and sigma arrays
+	VectorIntClass arraySize; //Size of actual arrays (size.x+2),(size.y+2)
+	
 	double *epsilon; //Pointer to epsilon array
 	double *sigmaX; //Pointer to sigmaX array
 	double *sigmaY; //Pointer to sigmaY array
