@@ -35,6 +35,7 @@ public:
 	
 	//Run Properties
 	int maxT; //Maximum number of timesteps 
+	int curT; //Current timestep
 	
 	//Source properties
 	double freq;

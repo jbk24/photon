@@ -84,13 +84,13 @@ void PhotonMPIClass::allocateChunkTags()
 	 
 }
 
-int PhotonMPIClass::symChunkCommInit() //Initializes buffers and counters for symChunkComm, call once per timestep
+int PhotonMPIClass::chunkCommInit() //Initializes buffers and counters for symChunkComm, call once per timestep
 {
-	//Reset current message count to 0
-	messageCount = 0;
+	//Reset current message counters to 0
+	msgSendCount = 0;
+	msgRecvCount = 0;
 	
 	//Initalize request and status buffers
-	
 	sendRequest = new MPI_Request[edgeCount];
 	recvRequest = new MPI_Request[edgeCount];
 	sendStatus = new MPI_Status[edgeCount];
@@ -100,17 +100,17 @@ int PhotonMPIClass::symChunkCommInit() //Initializes buffers and counters for sy
 	
 }
 
-int PhotonMPIClass::symChunkComm(double *sendData, double* recvData, int count, int origin, int dest) //Symmetric chunk communication using MPI_Isend and MPI_Irecv
+int PhotonMPIClass::chunkComm(int sendFlag, double *Data, int count, int local, int remote) //Chunk-to-chunk communication using MPI_Isend and MPI_Irecv
 {
 	
-	unsigned int originX = gid2x(origin,Simulation.numChunks.x);
-	unsigned int originY = gid2y(origin,Simulation.numChunks.x);
-	unsigned int destX = gid2x(dest,Simulation.numChunks.x);
-	unsigned int destY = gid2y(dest,Simulation.numChunks.x);
+	unsigned int localX = gid2x(local,Simulation.numChunks.x);
+	unsigned int localY = gid2y(local,Simulation.numChunks.x);
+	unsigned int remoteX = gid2x(remote,Simulation.numChunks.x);
+	unsigned int remoteY = gid2y(remote,Simulation.numChunks.x);
 	
 	//Deltas used to determine which direction message is going
-	int deltaX = destX - originX;
-	int deltaY = destY - originY;
+	int deltaX = remoteX - localX;
+	int deltaY = remoteY - localY;
 	int sendTag, recvTag; // Message tags
 	int ierr, errorFlag; //Error handling
 	
@@ -120,12 +120,12 @@ int PhotonMPIClass::symChunkComm(double *sendData, double* recvData, int count, 
 		switch (deltaX)
 		{
 			case -1: //negative-x outgoing message
-				sendTag = tagXn + origin;
-				recvTag = tagXp + dest;
+				sendTag = tagXn + local;
+				recvTag = tagXp + remote;
 				break;
 			case 1: //positive-x outgoing message
-				sendTag = tagXp + origin;
-				recvTag = tagXn + dest;
+				sendTag = tagXp + local;
+				recvTag = tagXn + remote;
 				break;
 		}
 	}
@@ -134,62 +134,75 @@ int PhotonMPIClass::symChunkComm(double *sendData, double* recvData, int count, 
 		switch (deltaY)
 		{
 			case -1: //negative-y outgoing message
-				sendTag = tagYn + origin;
-				recvTag = tagYp + dest;
+				sendTag = tagYn + local;
+				recvTag = tagYp + remote;
 				break;
 			case 1: //positive-y oytgoing message
-				sendTag = tagYp + origin;
-				recvTag = tagYn + dest;
+				sendTag = tagYp + local;
+				recvTag = tagYn + remote;
 				break;
 		}
 	}
 	
 	cout << "Rank: " << rank << endl;
-	cout << "Orign: " << origin << "  Dest: " << dest << "  DeltaY: " << deltaY <<  endl;
+	cout << "Local: " << local << "  Remote: " << remote << "  DeltaY: " << deltaY <<  endl;
 	cout << "TagYn: " << tagYn << endl;
 	cout << "TagYp: " << tagYp << endl;
 	cout << "sendTag: " << sendTag << endl;
 	cout << "recvTag: " << recvTag << endl;
 	cout << endl;
+	 
 	
-	//Asynchronous send
-	ierr = MPI_Isend(sendData, count, MPI_DOUBLE, ChunkMap[dest].processor, sendTag, MPI_COMM_WORLD, &sendRequest[messageCount]);
-	if(ierr != MPI_SUCCESS)
+	if(sendFlag) //send data
+	
 	{
-		printf("MPI_Isend error code: %d", ierr);
-		errorFlag = 1;
+		//Asynchronous send
+		ierr = MPI_Isend(Data, count, MPI_DOUBLE, ChunkMap[remote].processor, sendTag, MPI_COMM_WORLD, &sendRequest[msgSendCount]);
+		if(ierr != MPI_SUCCESS)
+		{
+			printf("MPI_Isend error code: %d", ierr);
+			errorFlag = 1;
+		}
+		msgSendCount++;
 	}
-	
-	//Asynchronous recieve
-	ierr = MPI_Irecv(recvData, count, MPI_DOUBLE, ChunkMap[dest].processor, recvTag, MPI_COMM_WORLD, &recvRequest[messageCount]);
-	if(ierr != MPI_SUCCESS)
+	else //recieve data
 	{
+		//Asynchronous recieve
+		ierr = MPI_Irecv(Data, count, MPI_DOUBLE, ChunkMap[remote].processor, recvTag, MPI_COMM_WORLD, &recvRequest[msgRecvCount]);
+		if(ierr != MPI_SUCCESS)
+		{
 		printf("MPI_Irecv error code: %d", ierr);
 		errorFlag = 1;
+		}
+		msgRecvCount++;
 	}
-	messageCount++;
-	if(errorFlag)
+	
+	if(errorFlag) //Handle errors
 		return 1;
 	else
 		return 0;
 }
 
-int PhotonMPIClass::symChunkCommWait() //Waits on all outstanding symChunkComm asynchronous sends and recieves
+int PhotonMPIClass::chunkCommWait() //Waits on all outstanding chunkComm asynchronous sends and recieves
 {
 	int ierr, errorFlag;
+	if(msgSendCount)
+	{
 	//Wait on sends
 	cout << "Rank: " << rank << "Wait for sends..." << endl;
-	ierr = MPI_Waitall(edgeCount,sendRequest, sendStatus);
+	ierr = MPI_Waitall(msgSendCount,sendRequest, sendStatus);
 	if(ierr != MPI_SUCCESS)
 	{
 		printf("MPI_Waitall send error code: %d", ierr);
 		errorFlag = 1;
 	}
-	
+	}
+
+	if(msgRecvCount)
+	{
 	//Wait on recives
 	cout << "Rank: " << rank << "Wait for recieves..." << endl;
-	ierr = MPI_Waitall(edgeCount,recvRequest, recvStatus);
-	//ierr = MPI_Wait(&recvRequest[0], &recvStatus[0]);
+	ierr = MPI_Waitall(msgRecvCount,recvRequest, recvStatus);
 	if(ierr != MPI_SUCCESS)
 	{
 		printf("MPI_Waitall recv error code: %d", ierr);
@@ -197,10 +210,14 @@ int PhotonMPIClass::symChunkCommWait() //Waits on all outstanding symChunkComm a
 	}
 	cout << "Done waiting... " << endl;
 	
-	if(errorFlag)
+	}
+	
+	if(errorFlag) //Handle errors
 		return 1;
 	else
 		return 0;
+		
+
 }
 
 

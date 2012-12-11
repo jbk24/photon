@@ -57,8 +57,8 @@ int readEpsSigmaCSV()
 	int chunkX = Simulation.numChunks.x/Simulation.processors.x;	// Number of chunks in x direction per processor
 	int chunkY = Simulation.numChunks.y/Simulation.processors.y; // Number of chunks in y direction per processor
 	
-	const int colSkip = (PhotonMPI.rank%Simulation.processors.y)*Simulation.cellLocal.y;		//Number of grid columns to skip until reaching processor column
-	const int rowSkip = (PhotonMPI.rank/Simulation.processors.y)*Simulation.cellLocal.x;		//Number of grid rows to skip until reaching processor row
+	const int colSkip = gid2y(PhotonMPI.rank,Simulation.processors.x)*Simulation.cellLocal.y;		//Number of grid columns to skip until reaching processor column
+	const int rowSkip = gid2x(PhotonMPI.rank,Simulation.processors.x)*Simulation.cellLocal.x;		//Number of grid rows to skip until reaching processor row
 		
 	// the csv file xCsv is read line-by-line into string "xLine" until eof
 	string eLine;
@@ -80,38 +80,32 @@ int readEpsSigmaCSV()
 	{
 		while (eCsv.good() && zCsv.good())
 		{
-			if (locGx < rowSkip)	//skip rows prior to processor
+			if (locGx < rowSkip) //skip rows prior to processor
 			{
-				// cout << "locGx increment: " << locGx << " >> "; 	//debug
 				locGx++;
-				getline (eCsv, eLine);		//get lineE and go to next, but just dump it!
-				getline (zCsv, zLine);		//get lineZ and go to next, but just dump it!
-				// cout << locGx << endl;	//debug
+				getline (eCsv, eLine); //get lineE and go to next, but just dump it!
+				getline (zCsv, zLine); //get lineZ and go to next, but just dump it!
 			}
-			else
+			else //read row
 			{	
 				if (locGx < (rowSkip + Simulation.cellLocal.x))	// step through rows of interest for the processor
 					{
 					getline (eCsv, eLine);
 					getline (zCsv, zLine);
-					//here we split each line by ",".
+					//Split each line by ",".
 					split( eRow, eLine, ",", split::no_empties );
 					split( zRow, zLine, ",", split::no_empties );
 					
 					locCx = locGx/Simulation.chunkSize.x;	// x location of chunk is globalx location / x size of chunk
 					locX  = locGx%Simulation.chunkSize.x;	// x location within chunk is global x location % x size of chunk
-					//cout << "X loc: " << locX << "\n";
 					locGy = colSkip;		// location of global y
 
 					while(locGy < (colSkip + Simulation.cellLocal.y))
 						{
+
 							locCy = locGy/Simulation.chunkSize.y;	// same logic as locCx
 							locY  = locGy%Simulation.chunkSize.y;	// same logic as locX
-							//cout << "Y loc:" << locY << "\n";
-							//cout << "global position = " << locGx << "," << locGy << endl;		//debug
-							//cout << "chunk ID = " << locCx << "," << locCy << endl;				//debug
-							//cout << "within chunk location = " << locX << "," << locY << endl; 	//debug
-							//cout << "Z = " << zRow[locGy] << "E = " << eRow[locGy] << endl;		//debug
+							
 							stringstream(eRow[locGy]) >> eDouble;
 							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].eps[xy2gid(locX,locY,Simulation.chunkSize.x)] = eDouble;
 							stringstream(zRow[locGy]) >> zDouble;
@@ -126,51 +120,10 @@ int readEpsSigmaCSV()
 		eCsv.close();
 		zCsv.close();
 	}
+	
 	else {
 		cout << "Can't open one of the csv files.\n";
 		return 1;
-	}
-
-	//the following outputs the result in a per chunk basis, I hope it is easy to understand...	
-	cout << "E & Z local CSV with Rank = " << PhotonMPI.rank << endl;
-	
-	locGx = rowSkip;					// same procedure as before, move row pointer to starting pt
-	for (unsigned int i = 0; i < chunkX; i++)	//note we are stepping per x chunk
-	{
-		locGy = colSkip;				//point column pointer to starting pt
-		for (unsigned int j = 0; j < chunkY; j++)	// stepping y chunk
-		{
-			locCx = locGx/Simulation.chunkSize.x;		// same procedure to comput chunk ID
-			locCy = locGy/Simulation.chunkSize.y;
-
-			if(locCx == 0 && locCy == 5)
-			{
-			cout << "\n\nChunk ID : (" << locCx << "," << locCy << ")\n";
-			cout << "Epsilon map: " << endl;
-			//simple writing back loop, can be used later for WriteCsv.cpp
-			for (unsigned int x = 0; x < Simulation.chunkSize.x; x++)	// unfortunately two nested for loops are needed for E & Z
-			{
-				for(unsigned int y = 0; y < Simulation.chunkSize.y; y++)
-				{
-					cout << ChunkMap[xy2gid(locCx,locCy, Simulation.numChunks.x)].eps[xy2gid(x,y,Simulation.chunkSize.x)] << ",";
-				}
-				cout << endl;
-			}
-			cout << "Sigma map: " << endl;			
-			for (unsigned int x = 0; x < Simulation.chunkSize.x; x++)
-			{
-				for(unsigned int y = 0; y < Simulation.chunkSize.y; y++)
-				{
-					cout << ChunkMap[xy2gid(locCx,locCy, Simulation.numChunks.x)].sigma[xy2gid(x,y,Simulation.chunkSize.x)] << ",";
-				}
-				cout << endl;
-			}
-			}
-			locGy += Simulation.chunkSize.y;	// notice we are stepping by number of grids per chunk, makes sense right?
-		
-		
-		}
-		locGx += Simulation.chunkSize.x;
 	}
 	 
 	return 0;
