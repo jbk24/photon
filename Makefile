@@ -8,6 +8,7 @@ OBJECTS= \
 	PhotonMPIClass.o \
 	SimulationClass.o \
 	ChunkClass.o \
+	EdgeBoundsClass.o \
 	global.o \
 	utilities.o \
 	csvFileIO.o \

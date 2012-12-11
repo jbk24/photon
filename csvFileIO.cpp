@@ -91,7 +91,7 @@ int readEpsSigmaCSV()
 			if (locGx < rowSkip) //skip rows prior to processor
 			{
 				locGx++;
-				getline (epsilon_CSV, sigma_line); //get sigma line and go to next, but just dump it!
+				getline (epsilon_CSV, epsilon_line); //get sigma line and go to next, but just dump it!
 				getline (sigmaX_CSV, sigmaX_line); //get sigmaX line and go to next, but just dump it!
 				getline (sigmaY_CSV, sigmaY_line); //get sigmaY line and go to next, but just dump it!
 				
@@ -100,12 +100,12 @@ int readEpsSigmaCSV()
 			{	
 				if (locGx < (rowSkip + Simulation.cellLocal.x))	// step through rows of interest for the processor
 					{
-					getline (epsilon_CSV, epsilon_line)
+					getline (epsilon_CSV, epsilon_line);
 					getline (sigmaX_CSV, sigmaX_line);
 					getline (sigmaY_CSV, sigmaY_line);
 					
 					//Split each line by ",".
-					split( epsilon_row, epsilon_line, "," split::no_empties )
+					split( epsilon_row, epsilon_line, ",", split::no_empties );
 					split( sigmaX_row, sigmaX_line, ",", split::no_empties );
 					split( sigmaY_row, sigmaY_line, ",", split::no_empties );
 					
@@ -121,11 +121,11 @@ int readEpsSigmaCSV()
 							
 							//Write into locX+1, locY+1 b/c arrays are size 2 larger than actual chunk for overlap
 							stringstream(epsilon_row[locGy]) >> epsilon_double;
-							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].epsilon[xy2gid(locX+1,locY+1,Simulation.chunkSize.x)]= epsilon_double;				
+							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].epsilon[xy2gid(locX+1,locY+1,Simulation.chunkSize.x+2)]= epsilon_double;				
 							stringstream(sigmaX_row[locGy]) >> sigmaX_double;
-							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaX[xy2gid(locX+1,locY+1,Simulation.chunkSize.x)] = sigmaX_double;
-							stringstream(sigmaY_row[logGy]) >> sigmaY_double;
-							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaY[xy2gid(locX+1,locY+1,Simulation.chunkSize.x)] = sigmaY_double;
+							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaX[xy2gid(locX+1,locY+1,Simulation.chunkSize.x+2)] = sigmaX_double;
+							stringstream(sigmaY_row[locGy]) >> sigmaY_double;
+							ChunkMap[xy2gid(locCx,locCy,Simulation.numChunks.x)].sigmaY[xy2gid(locX+1,locY+1,Simulation.chunkSize.x+2)] = sigmaY_double;
 							locGy++;
 						} 
 					locGx++;
@@ -152,23 +152,27 @@ int writeChunkMapCSV()
 
 	//Open files
 	ofstream procMap ("ChunkMapProcessors.csv"); //Map of grid chunk processors
+	ofstream gidMap ("ChunkMapGID.csv");
 	ofstream refineMap ("ChunkMapRefinement.csv"); //Map of grid chunk refinement
 	
 	//Check if files are open
-	if(procMap.is_open() && refineMap.is_open())
+	if(procMap.is_open() && gidMap.is_open() && refineMap.is_open())
 	{
 		for(int x = 0; x < Simulation.numChunks.x; x++) // Loop over x (rows in file)
 		{
 			for(int y = 0; y < Simulation.numChunks.y; y++) //Loop over y (columns in file)
 			{
 				procMap << ChunkMap[xy2gid(x,y,Simulation.numChunks.x)].processor;
+				gidMap << xy2gid(x,y,Simulation.numChunks.x);
 				refineMap << ChunkMap[xy2gid(x,y,Simulation.numChunks.x)].refinement;
 				if(y < (Simulation.numChunks.y - 1)) // Don't write "," on last column
 					procMap << ",";
+					gidMap << ",";
 					refineMap << ",";
 			}
 			//Go to next line
 			procMap << endl;
+			gidMap << endl;
 			refineMap << endl;
 		}
 	}
@@ -176,6 +180,7 @@ int writeChunkMapCSV()
 	
 	//Close files
 	procMap.close();
+	gidMap.close();
 	refineMap.close();
 	
 	return 0;
@@ -206,9 +211,34 @@ int writeArraytoCSV(double *array, int sizeX, int sizeY, string fileName)// Writ
 	}
 	else return 1; //Error in opening files
 	
-	//Close files
+	//Close file
 	file.close();
 	
+	return 0;
+}
+
+int writeAllChunkstoCSV(bool writeEpsilon, bool writeSigma, bool writeE, bool writeH) //Write arrays in all owned chunks to files 
+{
+	//Loop over owned chunks
+	for(int g = 0; g<Simulation.ownedChunkList.size(); g++)
+	{
+		unsigned int gid = Simulation.ownedChunkList.at(g);
+		string filename = "";
+		stringstream filenameStream;
+
+		if (writeEpsilon)
+		{
+			filenameStream.clear();
+			filenameStream.str("");
+			filenameStream << "Chunk " << gid << " epsilon.csv";
+			filename = filenameStream.str();
+			writeArraytoCSV(ChunkMap[gid].epsilon, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+		
+		}
+		
+		
+		
+	}
 	return 0;
 }
 

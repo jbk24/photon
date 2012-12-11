@@ -1,5 +1,6 @@
 #include "ChunkClass.h"
 #include "global.h"
+#include "utilities.h"
 #include <mpi.h>
 
 ChunkClass::ChunkClass()
@@ -7,15 +8,26 @@ ChunkClass::ChunkClass()
 	//Initialize chunk class parameters
 	refinement = 1;
 	
-	//Initalize all edges to PEC boundary, no comm (0)
-	edgeXn = 0;
-	edgeXp = 0;
-	edgeYn = 0;
-	edgeYp = 0;
-	
-	//Instantiate arrays--larger by 2 elements in each direction for overlap with adjacent chunks to facilitate FDTD
+	//Initialize array size variable
 	arraySize.x = Simulation.chunkSize.x + 2;
 	arraySize.y = Simulation.chunkSize.y + 2;
+	
+	//Initalize all edges to PEC boundary, no comm (0), all neighbors to -1 (no neighbor)
+	for(int k = 0; k<4; k++)
+	{
+		edge[k] = 0;
+		neighbor[k] = -1;
+	}
+	
+	edgeSend[0] = 1; //edge 0 sends to edge 1
+	edgeSend[1] = 0; //edge 1 sents to edge 0
+	edgeSend[2] = 3; //edge 2 sends to edge 3
+	edgeSend[3] = 2; //edge 3 sends to edge 2
+	
+	//Initalize edge bounds
+	initalizeEdgeBounds();
+
+	//Instantiate arrays--larger by 2 elements in each direction for overlap with adjacent chunks to facilitate FDTD
 	
 	//Geometry
 	epsilon = new double[(Simulation.chunkSize.x+2)*(Simulation.chunkSize.y+2)]();
@@ -42,11 +54,23 @@ ChunkClass::ChunkClass()
 ChunkClass::~ChunkClass()
 {
 	//Deallocate dynamically assigned memory
-	delete [] eps;
-	delete [] sigma;
-	delete [] Ez;
+	delete [] epsilon;
+	delete [] sigmaX;
+	delete [] sigmaY;
+	delete [] Ezx;
+	delete [] Ezy;
 	delete [] Hx;
 	delete [] Hy;
+	
+	//Prefactor arrays
+	delete [] PFA_Ezx;
+	delete [] PFB_Ezx;
+	delete [] PFA_Ezy;
+	delete [] PFB_Ezy;
+	delete [] PFA_Hx;
+	delete [] PFB_Hx;
+	delete [] PFA_Hy;
+	delete [] PFB_Hy;
 }
 
 //This function creates an MPI Struct to describe the current chunk, for transmitting or recieving data
@@ -92,16 +116,16 @@ int ChunkClass::computePrefactors() //Compute FDTD timestepping prefactors from 
 	double dX = Simulation.deltaX/refinement;
 	double dY = Simulation.deltaY/refinement;
 	double mu = 1; //Placeholder for future inclusion of magnetic materials
-	
 	double epsXavg, sigXavg, epsYavg, sigYavg; // Used to compute averages for H prefactors
+	
 	//Loop over interior of arrays
 	for(int x = 1; x<(arraySize.x-1); x++)
 	{
 		for(int y = 1; y<(arraySize.y-1); y++)
 		{
-			p = xy2gid(x,y,arraySize.x); //Current point
-			pXp = xy2gid(x+1,y,arraySize.x); //x+1 point
-			pYp = xy2gid(x,y+1,arraySize.y); //y+1 point
+			unsigned int p = xy2gid(x,y,arraySize.x); //Current point
+			unsigned int pXp = xy2gid(x+1,y,arraySize.x); //x+1 point
+			unsigned int pYp = xy2gid(x,y+1,arraySize.y); //y+1 point
 			
 			//Compute prefactors
 			
@@ -130,4 +154,58 @@ int ChunkClass::computePrefactors() //Compute FDTD timestepping prefactors from 
 	
 	return 0;
 	
+}
+
+void ChunkClass::initalizeEdgeBounds() //Initalize edge bounds based on size of array, must be updated under AMR
+{
+	//Initalize ownEdge
+	//X-negative
+	ownEdge[0].start.x = 1;
+	ownEdge[0].start.y = 1;
+	ownEdge[0].end.x = 1;
+	ownEdge[0].end.y = arraySize.y-2;
+	
+	//X-positive
+	ownEdge[1].start.x = arraySize.x-2;
+	ownEdge[1].start.y = 1;
+	ownEdge[1].end.x = arraySize.x-2;
+	ownEdge[1].end.y = arraySize.y-2;
+	
+	//Y-negative
+	ownEdge[2].start.x = 1;
+	ownEdge[2].start.y = 1;
+	ownEdge[2].end.x = arraySize.x-2;
+	ownEdge[2].end.y = 1;
+	
+	//Y-positve
+	ownEdge[3].start.x = 1;
+	ownEdge[3].start.y = arraySize.y-2;
+	ownEdge[3].end.x = arraySize.x-2;
+	ownEdge[3].end.y = arraySize.y-2;
+	
+	//Initalize overlapEdge
+	//X-negative
+	overlapEdge[0].start.x = 0;
+	overlapEdge[0].start.y = 1;
+	overlapEdge[0].end.x = 0;
+	overlapEdge[0].end.y = arraySize.y-2;
+	
+	//X-positive
+	overlapEdge[1].start.x = arraySize.x-1;
+	overlapEdge[1].start.y = 1;
+	overlapEdge[1].end.x = arraySize.x-1;
+	overlapEdge[1].end.y = arraySize.y-2;
+	
+	//Y-negative
+	overlapEdge[2].start.x = 1;
+	overlapEdge[2].start.y = 0;
+	overlapEdge[2].end.x = arraySize.x-2;
+	overlapEdge[2].end.y = 0;
+	
+	//Y-positve
+	overlapEdge[3].start.x = 1;
+	overlapEdge[3].start.y = arraySize.y-1;
+	overlapEdge[3].end.x = arraySize.x-2;
+	overlapEdge[3].end.y = arraySize.y-1;
+ 	
 }

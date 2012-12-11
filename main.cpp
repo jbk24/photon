@@ -30,9 +30,36 @@ int main(int argc, char *argv[])
 	if(readEpsSigmaCSV())
 		cout << "Rank: " << PhotonMPI.rank << " Error in reading CSV file.\n";
 	
+	cout << "Epsilon and sigma data read." << endl;
+	
+	if(PhotonMPI.rank == 0)
+	{
+		unsigned int gid = xy2gid(0,0,Simulation.numChunks.x);
+		writeArraytoCSV(ChunkMap[gid].epsilon, ChunkMap[gid].arraySize.x,ChunkMap[gid].arraySize.y, "rank 0 c0 before overlap.csv");
+		gid = xy2gid(0,1,Simulation.numChunks.x);
+		writeArraytoCSV(ChunkMap[gid].epsilon, ChunkMap[gid].arraySize.x,ChunkMap[gid].arraySize.y, "rank 0 c1 before overlap.csv");
+	}
+	
+	if(epsilonSigmaOverlap())
+		cout << "Problem overlapping epsilon and sigma data." << endl;
+	
+	//Write all epsilon chunks to file
+	writeAllChunkstoCSV(true,false,false,false);
+	
+	
+	/*
+	if(PhotonMPI.rank == 0)
+	{
+		unsigned int gid = xy2gid(0,1,Simulation.numChunks.x);
+		writeArraytoCSV(ChunkMap[gid].epsilon, ChunkMap[gid].arraySize.x,ChunkMap[gid].arraySize.y, "rank 0 after overlap.csv");
+	}
+	 ** /
+	
+	
+	/*
 	if(PhotonMPI.rank == 1)
 		writeArraytoCSV(ChunkMap[xy2gid(6,0,Simulation.numChunks.x)].eps, Simulation.chunkSize.x, Simulation.chunkSize.y, "rank1 before eps.csv");
-	
+
 	//Test MPI comm
 	if(PhotonMPI.rank == 0)
 	{
@@ -61,7 +88,7 @@ int main(int argc, char *argv[])
 			cout << "Rank: " << PhotonMPI.rank << " Error in writing CSV file.\n";
 	}
 	
-
+  */
 	//Perform global cleanup
 	globalCleanUp();
 	
