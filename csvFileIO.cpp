@@ -217,7 +217,7 @@ int writeArraytoCSV(double *array, int sizeX, int sizeY, string fileName)// Writ
 	return 0;
 }
 
-int writeAllChunkstoCSV(bool writeEpsilon, bool writeSigma, bool writeE, bool writeH) //Write arrays in all owned chunks to files 
+int writeAllChunkstoCSV(int dataType) //Write arrays in all owned chunks to files 
 {
 	//Loop over owned chunks
 	for(int g = 0; g<Simulation.ownedChunkList.size(); g++)
@@ -225,16 +225,51 @@ int writeAllChunkstoCSV(bool writeEpsilon, bool writeSigma, bool writeE, bool wr
 		unsigned int gid = Simulation.ownedChunkList.at(g);
 		string filename = "";
 		stringstream filenameStream;
-
-		if (writeEpsilon)
+		filenameStream.clear();
+		filenameStream.str("");
+		
+		switch(dataType)
 		{
-			filenameStream.clear();
-			filenameStream.str("");
-			filenameStream << "Chunk " << gid << " epsilon.csv";
-			filename = filenameStream.str();
-			writeArraytoCSV(ChunkMap[gid].epsilon, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+			case 0: //epsilon
+				filenameStream << "Chunk " << gid << " epsilon.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].epsilon, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			
+			case 1: //sigmaX
+				filenameStream << "Chunk " << gid << " sigmaX.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].sigmaX, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			case 2: //sigmaY
+				filenameStream << "Chunk " << gid << " sigmaY.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].sigmaX, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			case 3: //Ezx
+				filenameStream << "Chunk " << gid << " Ezx.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			case 4: //Ezy
+				filenameStream << "Chunk " << gid << " Ezy.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].Ezy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			case 5: //Hx
+				filenameStream << "Chunk " << gid << " Hx.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].Hx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			case 6: //Hy;
+				filenameStream << "Chunk " << gid << " Hy.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].Hy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
 		
 		}
+		
+		
 		
 		
 		

@@ -18,6 +18,10 @@ void initializeChunkMap()
 			int processorY = y/(Simulation.numChunks.y/Simulation.processors.y); //Y position of current processor
 			ChunkMap[curGid].processor = xy2gid(processorX, processorY, Simulation.processors.x); //get rank of processor
 			
+			//Allocate arrays if on current processor
+			if(ChunkMap[curGid].processor == PhotonMPI.rank)
+				ChunkMap[curGid].allocateArrays();
+			
 			//Process neighbors
 			if(x>0) //x-negative
 				ChunkMap[curGid].neighbor[0] = xy2gid(x-1,y,Simulation.numChunks.x);
@@ -95,6 +99,9 @@ int getChunkEdgeConditions(int gid, int gidOther) //Get edge conditions for edge
 
 int epsilonSigmaOverlap() //Communicate epsilon and sigma along edges to achieve array overlap
 {
+	//Initalize MPI comm system
+	PhotonMPI.chunkCommInit();
+	
 	//Loop over list of owned chunks
 	for(int g = 0; g<Simulation.ownedChunkList.size(); g++)
 	{
@@ -103,8 +110,8 @@ int epsilonSigmaOverlap() //Communicate epsilon and sigma along edges to achieve
 		unsigned int gidOther;
 		unsigned int destEdge;
 		
-		if(PhotonMPI.rank ==0)
-			cout << "Current Chunk: " << gid << endl;
+		//Intialize data buffers for current chunk
+		ChunkMap[gid].initalizeDataBuffers();
 		
 		//Process edges
 		for (int k = 0; k<4; k++)
@@ -114,41 +121,40 @@ int epsilonSigmaOverlap() //Communicate epsilon and sigma along edges to achieve
 				
 				case 0: // PEC boundary, duplicate epsilon and sigma
 				//	cout << "PEC on edge " << k << " of chunk " << gid << endl;
-					//Epsilon
-					oneWayIntraArrayCopy(ChunkMap[gid].epsilon, ChunkMap[gid].arraySize.x, ChunkMap[gid].ownEdge[k], ChunkMap[gid].overlapEdge[k]);
-					//SigmaX
-					oneWayIntraArrayCopy(ChunkMap[gid].sigmaX, ChunkMap[gid].arraySize.x, ChunkMap[gid].ownEdge[k], ChunkMap[gid].overlapEdge[k]);
-					//SigmaY
-					oneWayIntraArrayCopy(ChunkMap[gid].sigmaY, ChunkMap[gid].arraySize.x, ChunkMap[gid].ownEdge[k], ChunkMap[gid].overlapEdge[k]);
-					break;
 					
+					//Epsilon
+					oneWayIntraArrayCopy(ChunkMap[gid].epsilon, ChunkMap[gid].ownEdge[k], ChunkMap[gid].overlapEdge[k]);
+					//SigmaX
+					oneWayIntraArrayCopy(ChunkMap[gid].sigmaX, ChunkMap[gid].ownEdge[k], ChunkMap[gid].overlapEdge[k]);
+					//SigmaY
+					oneWayIntraArrayCopy(ChunkMap[gid].sigmaY, ChunkMap[gid].ownEdge[k], ChunkMap[gid].overlapEdge[k]);
+					break;
+					 
 				case 1: //internal comm, matched refinement, 
 					//Get neighbor
+					
 					gidOther = ChunkMap[gid].neighbor[k];
 					destEdge = ChunkMap[gid].edgeSend[k];
 					//Epsilon
-					oneWayInternalArrayCopy(ChunkMap[gid].epsilon,ChunkMap[gidOther].epsilon, ChunkMap[gid].arraySize.x, ChunkMap[gidOther].arraySize.x, ChunkMap[gid].ownEdge[k], ChunkMap[gidOther].overlapEdge[destEdge]);
-					/*if(PhotonMPI.rank == 0 && gid ==0)
-					{
-						cout << "OwnEdge Start: (" << ChunkMap[gid].ownEdge[k].start.x << "," << ChunkMap[gid].ownEdge[k].start.y << ")" << endl;
-						cout << "OwnEdge End: (" << ChunkMap[gid].ownEdge[k].end.x << "," << ChunkMap[gid].ownEdge[k].end.y << ")" << endl;
-						cout << "OverlapEdge Start: (" << ChunkMap[gid].overlapEdge[k].start.x << "," << ChunkMap[gid].overlapEdge[k].start.y << ")" << endl;
-						cout << "OverlapEdge End: (" << ChunkMap[gid].overlapEdge[k].end.x << "," << ChunkMap[gid].overlapEdge[k].end.y << ")" << endl;
-						
-			
-					}
-					 **/
-					
+					oneWayInternalArrayCopy(ChunkMap[gid].epsilon,ChunkMap[gidOther].epsilon, ChunkMap[gid].ownEdge[k], ChunkMap[gidOther].overlapEdge[destEdge]);
 					//SigmaX
-				 	oneWayInternalArrayCopy(ChunkMap[gid].sigmaX,ChunkMap[gidOther].sigmaX, ChunkMap[gid].arraySize.x, ChunkMap[gidOther].arraySize.x, ChunkMap[gid].ownEdge[k], ChunkMap[gidOther].overlapEdge[destEdge]);
+				 	oneWayInternalArrayCopy(ChunkMap[gid].sigmaX,ChunkMap[gidOther].sigmaX,  ChunkMap[gid].ownEdge[k], ChunkMap[gidOther].overlapEdge[destEdge]);
 					//SigmaY
-					oneWayInternalArrayCopy(ChunkMap[gid].sigmaY,ChunkMap[gidOther].sigmaY, ChunkMap[gid].arraySize.x, ChunkMap[gidOther].arraySize.x, ChunkMap[gid].ownEdge[k], ChunkMap[gidOther].overlapEdge[destEdge]);
+					oneWayInternalArrayCopy(ChunkMap[gid].sigmaY,ChunkMap[gidOther].sigmaY, ChunkMap[gid].ownEdge[k], ChunkMap[gidOther].overlapEdge[destEdge]);
 					break;
+					 
 				case 2: //internal comm, decreasing refinement
 					break;
 				case 3: //internal comm, increasing refinement
 					break;
 				case 4: //external comm, matched refinement
+
+					PhotonMPI.sendChunkComm(gid,0,k); //Send Epsilon
+					PhotonMPI.recvChunkComm(gid,0,k); //Recive Epsilon;
+					PhotonMPI.sendChunkComm(gid,1,k); //Send sigmaX
+					PhotonMPI.recvChunkComm(gid,1,k); //Recive sigmaX
+					PhotonMPI.sendChunkComm(gid,2,k); //Send sigmaY
+					PhotonMPI.recvChunkComm(gid,2,k); //Recive sigmaY
 					break;
 				case 5: //external comm, decreasing refinement
 					break;
@@ -158,11 +164,17 @@ int epsilonSigmaOverlap() //Communicate epsilon and sigma along edges to achieve
 		}
 	}
 	
+	//Wait on sends and recieves
+	PhotonMPI.chunkCommWait();
+	
+	//Process recieved data
+	processRecievedData();
+	
 	return 0;
 }
 
 //Copy a chunk of elements from one part of an array to another
-int oneWayIntraArrayCopy(double *array, int sizeX, EdgeBoundsClass origin, EdgeBoundsClass dest)
+int oneWayIntraArrayCopy(double *array, ArraySectorClass origin, ArraySectorClass dest)
 {
 	//Calculate X-Y offests
 	int xOffset = dest.start.x - origin.start.x;
@@ -180,7 +192,7 @@ int oneWayIntraArrayCopy(double *array, int sizeX, EdgeBoundsClass origin, EdgeB
 			//cout << "(x,y)				  : (" << x << "," << y << ") = " << array[xy2gid(x,y,sizeX)] << endl;
 			//cout << "(x+xOffest,y+yOffset): (" << x+xOffset << "," << y+yOffset << ") = " << array[xy2gid(x+xOffset,y+yOffset,sizeX)] << endl;
 			
-			array[xy2gid(x+xOffset,y+yOffset,sizeX)] = array[xy2gid(x,y,sizeX)];
+			array[xy2gid(x+xOffset,y+yOffset,dest.sizeX)] = array[xy2gid(x,y,origin.sizeX)];
 			
 			//cout << "(x+xOffest,y+yOffset): (" << x+xOffset << "," << y+yOffset << ") = " << array[xy2gid(x+xOffset,y+yOffset,sizeX)] << endl;
 			
@@ -189,10 +201,8 @@ int oneWayIntraArrayCopy(double *array, int sizeX, EdgeBoundsClass origin, EdgeB
 	return 0;
 }
 
-
-
 //Copy a chunk of elements from orign array to dest array
-int oneWayInternalArrayCopy(double *originArray, double *destArray, int originSizeX, int destSizeX, EdgeBoundsClass origin, EdgeBoundsClass dest) 
+int oneWayInternalArrayCopy(double *originArray, double *destArray, ArraySectorClass origin, ArraySectorClass dest) 
 {
 	//Calculate X-Y offests
 	int xOffset = dest.start.x - origin.start.x;
@@ -200,23 +210,31 @@ int oneWayInternalArrayCopy(double *originArray, double *destArray, int originSi
 	
 	//cout << "xOffset: " << xOffset << endl;
 	//cout << "yOffset: " << yOffset << endl;
+	//cout << "Origin Start (x,y) : (" << origin.start.x << "," << origin.start.y << ")" << endl;
+	//cout << "Origin End (x,y)   : (" << origin.end.x << "," << origin.end.y << ")" << endl;
+	//cout << "Dest Start (x,y)   : (" << dest.start.x << "," << dest.start.y << ")" << endl;
+	//cout << "Dest End (x,y)     : (" << dest.end.x << "," << dest.end.y << ")" << endl;
 	
+	//Check if data are oriented in same way
 	//Loop over origin array, within bounds defined by origin
-	for(int x = origin.start.x; x <= origin.end.x; x++)
-	{
-		for(int y = origin.start.y; y <= origin.end.y; y++)
+		for(int x = origin.start.x; x <= origin.end.x; x++)
 		{
-			//cout << "(x,y)				  : (" << x << "," << y << ") = " << originArray[xy2gid(x,y,originSizeX)] << endl;
-			//cout << "(x+xOffest,y+yOffset): (" << x+xOffset << "," << y+yOffset << ") = " << destArray[xy2gid(x+xOffset,y+yOffset,destSizeX)] << endl;
-			
-			destArray[xy2gid(x+xOffset,y+yOffset,destSizeX)] = originArray[xy2gid(x,y,originSizeX)];
-		}
-	}	
+			for(int y = origin.start.y; y <= origin.end.y; y++)
+			{
+				//cout << "(x,y)				  : (" << x << "," << y << ") = " << originArray[xy2gid(x,y,origin.sizeX)] << endl;
+				//cout << "Dest gid:" << xy2gid(x+xOffset,y+yOffset,dest.sizeX) << endl;
+				destArray[xy2gid(x+xOffset,y+yOffset,dest.sizeX)] = originArray[xy2gid(x,y,origin.sizeX)];
+					
+				//cout << "(x+xOffest,y+yOffset): (" << x+xOffset << "," << y+yOffset << ") = " << destArray[xy2gid(x+xOffset,y+yOffset,dest.sizeX)] << endl;
+			}
+		}	
+	
+
 	return 0;
 }
 
 //Bidirectionally copy elements between arrays
-int twoWayInternalArrayCopy(double *array1, double *array2, int array1SizeX, int array2SizeX, EdgeBoundsClass array1send, EdgeBoundsClass array1recv, EdgeBoundsClass array2send, EdgeBoundsClass array2recv)
+int twoWayInternalArrayCopy(double *array1, double *array2, int array1SizeX, int array2SizeX, ArraySectorClass array1send, ArraySectorClass array1recv, ArraySectorClass array2send, ArraySectorClass array2recv)
 {
 	//Calculate X-Y offests
 	int xRecvOffset1to2 = array2recv.start.x - array1send.start.x;
@@ -237,3 +255,54 @@ int twoWayInternalArrayCopy(double *array1, double *array2, int array1SizeX, int
 	}
 	return 0;
 }
+
+int vectorIntoArrayCopy(double *vector, double *destArray, ArraySectorClass dest)
+{
+	int index = 0; //Index along vector
+	for(int x = dest.start.x; x <= dest.end.x; x++)
+		{
+			for(int y = dest.start.y; y <= dest.end.y; y++)
+			{
+
+				destArray[xy2gid(x,y,dest.sizeX)] = vector[index];
+				index++;
+			}
+		}	
+		return 0;
+}
+int arrayIntoVectorCopy(double *vector, double *sourceArray, ArraySectorClass source)
+{
+	int index = 0; //Index along vector
+	for(int x = source.start.x; x <= source.end.x; x++)
+		{
+			for(int y = source.start.y; y <= source.end.y; y++)
+			{
+
+				 vector[index] = sourceArray[xy2gid(x,y,source.sizeX)]; 
+				index++;
+			}
+		}	
+		return 0;
+}
+
+int processRecievedData() //Process all data recieves currently indicated in PhotonMPI.recievedData vector
+{
+	//Loop over number of data recieves
+	for(unsigned int k = 0; k < PhotonMPI.recievedData.size(); k++)
+	{
+		unsigned int gid = PhotonMPI.recievedData.at(k).chunk;
+		unsigned int recvBufNum = PhotonMPI.recievedData.at(k).dataBuffer;
+		double* destArray;
+		
+		//Get destination array, based on data type
+	    destArray = getDataPointerFromType(gid, ChunkMap[gid].recvBuffers[recvBufNum].dataType);
+		
+		//Copy data from recieve bufferto target data array
+		vectorIntoArrayCopy(ChunkMap[gid].recvBuffers[recvBufNum].dataBuf, destArray, ChunkMap[gid].recvBuffers[recvBufNum].remote);
+
+	}
+	return 0;
+}
+
+
+

@@ -1,6 +1,7 @@
 #include "global.h"
 #include "utilities.h"
 #include <stdio.h>
+#include <iostream>
 
 PhotonMPIClass PhotonMPI;
 SimulationClass Simulation;
@@ -20,7 +21,7 @@ int instantiateChunkMap()
 	updateChunkList();
 	
 	//Build ChunkMap MPI Tags
-	PhotonMPI.allocateChunkTags();
+	PhotonMPI.allocateAddressSpace();
 	
 	return 0; //No error handling yet
 }

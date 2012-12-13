@@ -1,0 +1,36 @@
+	unsigned int localX = gid2x(local,Simulation.numChunks.x);
+	unsigned int localY = gid2y(local,Simulation.numChunks.x);
+	unsigned int remoteX = gid2x(remote,Simulation.numChunks.x);
+	unsigned int remoteY = gid2y(remote,Simulation.numChunks.x);
+	
+	//Deltas used to determine which direction message is going
+	int deltaX = remoteX - localX;
+	int deltaY = remoteY - localY;
+	int recvTag; // Message tag
+	int ierr, errorFlag; //Error handling
+	
+	//Determine tags for incoming message (recieve)
+	if (deltaX != 0) //x-traveling message
+	{
+		switch (deltaX)
+		{
+			case -1: //negative-x outgoing message
+				recvTag = tagXp + remote;
+				break;
+			case 1: //positive-x outgoing message
+				recvTag = tagXn + remote;
+				break;
+		}
+	}
+	else //y-traveling message
+	{
+		switch (deltaY)
+		{
+			case -1: //negative-y outgoing message
+				recvTag = tagYp + remote;
+				break;
+			case 1: //positive-y oytgoing message
+				recvTag = tagYn + remote;
+				break;
+		}
+	}

@@ -3,8 +3,9 @@
 /* This class stores all parameters associated with the current simulation, primarily data loaded from the control file, as well as other runtime variables */
 
 #include <string>
-#include "VectorIntClass.h"
 #include <vector>
+#include "VectorIntClass.h"
+
 using namespace std;
 
 class SimulationClass

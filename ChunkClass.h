@@ -2,7 +2,8 @@
 #define CHUNKCLASS_H
 /* This class describes individual "chunks" of the computational grid. Each processor will own more than one chunk*/
 #include "VectorIntClass.h"
-#include "EdgeBoundsClass.h"
+#include "ArraySectorClass.h"
+#include "DataBufferClass.h"
 
 class ChunkClass
 {
@@ -22,6 +23,8 @@ public:
 	// 4 = external comm, matched refinement
 	// 5 = external comm, decreasing refinement (scale down array)
 	// 6 = external comm, increasing refinement (scale up array)
+	
+	//Edge numbering:
 	// 0: negative-x edge
 	// 1: positive-x edge
 	// 2: negative-y edge
@@ -31,10 +34,18 @@ public:
 	int edge [4]; //Condition on each of the 4 edges
 	int edgeSend[4]; // get index for matching edge when sending
 	int neighbor [4]; //GID of neighbor on each edge
-	EdgeBoundsClass ownEdge[4];//Locations of start and end point for each owned edge
-	EdgeBoundsClass overlapEdge[4]; //Locations of start and end points for each overlap edge
+	ArraySectorClass ownEdge[4];//Locations of start and end point for each owned edge
+	ArraySectorClass overlapEdge[4]; //Locations of start and end points for each overlap edge
 	
-	//Arrays: arrays are of (size.x+2)(size.y+2)*refinement, for overlap with adjacent arrays
+	//MPI DATA IO buffers
+	int numDataBuffers; //Number of data buffers
+	DataBufferClass *sendBuffers; //Pointer to sending buffers
+	DataBufferClass *recvBuffers; //Pointer to recieve buffers
+	//Current send and recieve buffers, should be reinitalized to 0 before each comm phase by calling ChunkClass::initalizeDataBuffers()
+	int curSendBuf; //Current data send buffer, incremented by PhotonMPIClass::sendChunkComm
+	int curRecvBuf; //Current data recieve buffer, incremented by PhotonMPIClass::recvChunkComm
+	
+	//Arrays: arrays are of (size.x+2)(size.y+2)*refinement^2, for overlap with adjacent arrays
 	//Eps and sigma arrays
 	VectorIntClass arraySize; //Size of actual arrays (size.x+2),(size.y+2)
 	
@@ -60,9 +71,16 @@ public:
 	
 	//Methods
 	int createMPIStruct();
+	void allocateArrays(); //Allocate arrays for chunk
 	int computePrefactors(); //Compute FDTD timestepping prefactors from constants
 	void initalizeEdgeBounds(); //Initalize edge bounds based on size of array, must be updated under AMR
+	void initalizeDataBuffers(); //Initalize data buffers for chunk, must be called before each comm phase
 	
+	
+private:
+	bool arraysAllocated; //True if arrays have been allocated, used during cleanup
+	void deallocateArrays(); //Delete arrays for chunk
 };
+
 
 #endif // CHUNKCLASS_H
