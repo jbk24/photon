@@ -46,12 +46,12 @@ int update_E_from_H()
 			}
 		}
 		
-		/*if(ChunkMap[gid].sourceFlag) //Source present in current chunk, update Ezx and Ezy to reflect this
+		if(ChunkMap[gid].sourceFlag) //Source present in current chunk, update Ezx and Ezy to reflect this
 		{
 
 			gaussianEzSource(gid);
 		}
-		*/
+		
 		//Send newly computed data associated with current chunk
 		E_updateComm(gid);
 	}
