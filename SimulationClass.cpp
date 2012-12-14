@@ -36,7 +36,7 @@ void SimulationClass::readControl(string filePath)
 			getline (inputFile, line);
 			//here we split each line into field and data by ":" & " ".
 			split( field_data, line, ": ", split::no_empties );			
-			// cout << field_data[0] << endl; //debug, normally commented out
+			//cout << field_data[0] << endl; //debug, normally commented out
 
 			// the following basically performs look up function to determine how to treat the data in each field
 			switch (field_index(field_data[0]))
@@ -54,8 +54,6 @@ void SimulationClass::readControl(string filePath)
 				case 2: //directory, in string format
 				{
 					//we need to add the directory back because the split function splits ":"
-					field_data[1].append(":");
-					field_data[1].append(field_data[2]);	
 					dir = field_data[1];
 					break;
 				}

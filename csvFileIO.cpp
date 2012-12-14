@@ -65,9 +65,20 @@ int readEpsSigmaCSV()
 	string sigmaX_line;
 	string sigmaY_line;
 	
-	ifstream epsilon_CSV ("epsilon.csv");
-	ifstream sigmaX_CSV ("sigmaX.csv");
-	ifstream sigmaY_CSV ("sigmaY.csv");
+	stringstream filenameStream;
+	filenameStream.clear();
+	filenameStream << Simulation.dir << "epsilon.csv";
+	ifstream epsilon_CSV (filenameStream.str().c_str());
+	
+	filenameStream.clear();
+	filenameStream.str("");
+	filenameStream << Simulation.dir << "sigmaX.csv";
+	ifstream sigmaX_CSV (filenameStream.str().c_str());
+
+	filenameStream.clear();
+	filenameStream.str("");
+	filenameStream << Simulation.dir << "sigmaY.csv";
+	ifstream sigmaY_CSV (filenameStream.str().c_str());
 	
 	vector <string> epsilon_row;
 	vector <string> sigmaX_row;
@@ -227,89 +238,89 @@ int writeAllChunkstoCSV(int dataType) //Write arrays in all owned chunks to file
 		stringstream filenameStream;
 		filenameStream.clear();
 		filenameStream.str("");
-		
+	
 		switch(dataType)
 		{
 			case 0: //epsilon
-				filenameStream << "Chunk_" << gid << "epsilon.csv";
+				filenameStream << Simulation.dir << "data/Chunk_" << gid << "epsilon.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].epsilon, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			
 			case 1: //sigmaX
-				filenameStream << "Chunk_" << gid << "sigmaX.csv";
+				filenameStream <<Simulation.dir << "data/Chunk_" << gid << "sigmaX.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].sigmaX, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 2: //sigmaY
-				filenameStream << "Chunk_" << gid << "sigmaY.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "sigmaY.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].sigmaX, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 3: //Ezx
-				filenameStream << "Chunk_" << gid << "Ezx.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "Ezx.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 4: //Ezy
-				filenameStream << "Chunk_" << gid << "Ezy.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "Ezy.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].Ezy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 5: //Hx
-				filenameStream << "Chunk_" << gid << "Hx.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "Hx.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].Hx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 6: //Hy;
-				filenameStream << "Chunk_" << gid << "Hy.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "Hy.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].Hy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			
 			case 7: //PFA_Ezx
-				filenameStream << "Chunk_" << gid << "PFA_Ezx.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "PFA_Ezx.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].PFA_Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 				
 			case 8: //PFB_Ezx
-				filenameStream << "Chunk_" << gid << "PFB_Ezx.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "PFB_Ezx.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].PFB_Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			
 			case 9: //PFA_Ezy
-				filenameStream << "Chunk_" << gid << "PFA_Ezy.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "PFA_Ezy.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].PFA_Ezy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			
 			case 10: //PFB_Ezy
-				filenameStream << "Chunk_" << gid << "PFB_Ezy.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "PFB_Ezy.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].PFB_Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			
 			case 11: //PFA_Hx
-				filenameStream << "Chunk_" << gid << "PFA_Hx.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "PFA_Hx.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].PFA_Hx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 12: //PFB_Hx
-				filenameStream << "Chunk_" << gid << "PFB_Hx.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "PFB_Hx.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].PFB_Hx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			
 			case 13: //PFA_Hy
-				filenameStream << "Chunk_" << gid << "PFA_Hy.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "PFA_Hy.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].PFA_Hy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			
 			case 14: //PFB_Hy
-				filenameStream << "Chunk_" << gid << "PFB_Hy.csv";
+				filenameStream <<  Simulation.dir << "data/Chunk_" << gid << "PFB_Hy.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].PFB_Hy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
