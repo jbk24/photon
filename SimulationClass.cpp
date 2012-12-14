@@ -103,7 +103,21 @@ void SimulationClass::readControl(string filePath)
 					stringstream(xy[1]) >> processors.y;
 					break;
 				}
-					
+				case 10: //deltaT: FDTD timestep
+				{
+					stringstream(field_data[1]) >> deltaT;
+					break;	
+				}
+				case 11: //deltaX: FDTD x-spatial step
+				{
+					stringstream(field_data[1]) >> deltaX;
+					break;	
+				}
+				case 12: //deltaY: FDTD y-spatial step
+				{
+					stringstream(field_data[1]) >> deltaY;
+					break;	
+				}
 			}
 		}
 		inputFile.close();
@@ -134,6 +148,9 @@ unsigned int SimulationClass::field_index(string &s)
 		if (s == "maxT")		return 7;
 		if (s == "freq")		return 8;
 		if (s == "processors")  return 9;
+		if (s == "deltaT")		return 10;
+		if (s == "deltaX")		return 11;
+		if (s == "deltaY")		return 12;
 
 		return 0;
 	
