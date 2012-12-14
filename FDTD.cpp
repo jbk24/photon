@@ -13,6 +13,8 @@
 	for(Simulation.curT = 0; Simulation.curT<Simulation.maxT; Simulation.curT++)
 	{
 
+		cout << "On timestep: " << Simulation.curT << endl;
+		
 		//Update E field from H field at curT
 		update_E_from_H();
 	

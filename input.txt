@@ -7,4 +7,6 @@ cellGlobal: (60,40)
 maxT: 50
 freq: 32.5
 processors: (2,2)
-something wicked
+deltaT: 3.33e-15
+deltaX: 1e-6
+deltaY: 1e-6
