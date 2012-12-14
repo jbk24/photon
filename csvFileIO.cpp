@@ -231,46 +231,87 @@ int writeAllChunkstoCSV(int dataType) //Write arrays in all owned chunks to file
 		switch(dataType)
 		{
 			case 0: //epsilon
-				filenameStream << "Chunk " << gid << " epsilon.csv";
+				filenameStream << "Chunk_" << gid << " epsilon.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].epsilon, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			
 			case 1: //sigmaX
-				filenameStream << "Chunk " << gid << " sigmaX.csv";
+				filenameStream << "Chunk_" << gid << " sigmaX.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].sigmaX, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 2: //sigmaY
-				filenameStream << "Chunk " << gid << " sigmaY.csv";
+				filenameStream << "Chunk_" << gid << " sigmaY.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].sigmaX, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 3: //Ezx
-				filenameStream << "Chunk " << gid << " Ezx.csv";
+				filenameStream << "Chunk_" << gid << " Ezx.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 4: //Ezy
-				filenameStream << "Chunk " << gid << " Ezy.csv";
+				filenameStream << "Chunk_" << gid << " Ezy.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].Ezy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 5: //Hx
-				filenameStream << "Chunk " << gid << " Hx.csv";
+				filenameStream << "Chunk_" << gid << " Hx.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].Hx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			case 6: //Hy;
-				filenameStream << "Chunk " << gid << " Hy.csv";
+				filenameStream << "Chunk_" << gid << " Hy.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].Hy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 			
 			case 7: //PFA_Ezx
-				filenameStream << "Chunk " << gid << " PFA_Ezx.csv";
+				filenameStream << "Chunk_" << gid << " PFA_Ezx.csv";
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].PFA_Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+				
+			case 8: //PFB_Ezx
+				filenameStream << "Chunk_" << gid << " PFB_Ezx.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].PFB_Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			
+			case 9: //PFA_Ezy
+				filenameStream << "Chunk_" << gid << " PFA_Ezy.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].PFA_Ezy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			
+			case 10: //PFB_Ezy
+				filenameStream << "Chunk_" << gid << " PFB_Ezy.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].PFB_Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			
+			case 11: //PFA_Hx
+				filenameStream << "Chunk_" << gid << " PFA_Hx.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].PFA_Hx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			case 12: //PFB_Hx
+				filenameStream << "Chunk_" << gid << " PFB_Hx.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].PFB_Hx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			
+			case 13: //PFA_Hy
+				filenameStream << "Chunk_" << gid << " PFA_Hy.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].PFA_Hy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
+			
+			case 14: //PFB_Hy
+				filenameStream << "Chunk_" << gid << " PFB_Hy.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].PFB_Hy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
 		
 		}

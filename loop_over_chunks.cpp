@@ -71,7 +71,6 @@ int update_H_from_E()
 	//Initalize MPI comm system
 	PhotonMPI.chunkCommInit();
 	
-	
 	//Loop over owned chunks
 	for(int g = 0; g<Simulation.ownedChunkList.size(); g++)
 	{
@@ -101,7 +100,7 @@ int update_H_from_E()
 				unsigned int py = xy2gid(x,y+1,ChunkMap[gid].arraySize.x); //j+1 point, for derivative
 				
 				Hx[p] = Hx[p]*PFA_Hx[p] - PFB_Hx[p]*(Ezx[py]-Ezx[p]+Ezy[py]-Ezy[p]);
-				Hy[p] = Hy[p]*PFA_Hy[p] - PFB_Hy[p]*(Ezx[px]-Ezx[p]+Ezy[px]-Ezx[p]);
+				Hy[p] = Hy[p]*PFA_Hy[p] - PFB_Hy[p]*(Ezx[px]-Ezx[p]+Ezy[px]-Ezy[p]);
 			}
 		}
 		//Send newly computed data associated with current chunk

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "VectorIntClass.h"
+#include "ArraySectorClass.h"
 
 using namespace std;
 
@@ -43,6 +44,7 @@ public:
 	
 	//Source properties
 	double freq;
+	ArraySectorClass sourceLocation; //Specify start (x,y) and end (x,y) for source region
 	
 	//Functions
 	

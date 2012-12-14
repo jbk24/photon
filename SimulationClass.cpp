@@ -118,6 +118,20 @@ void SimulationClass::readControl(string filePath)
 					stringstream(field_data[1]) >> deltaY;
 					break;	
 				}
+				case 13: //source start location
+				{
+					vector <string> xy;
+					split(xy, field_data[1], "(,)", split::no_empties);
+					stringstream(xy[0]) >> sourceLocation.start.x;
+					stringstream(xy[1]) >> sourceLocation.start.y;
+					break;
+				}
+				case 14:
+					vector <string> xy;
+					split(xy, field_data[1], "(,)", split::no_empties);
+					stringstream(xy[0]) >> sourceLocation.end.x;
+					stringstream(xy[1]) >> sourceLocation.end.y;
+					break;
 			}
 		}
 		inputFile.close();
@@ -151,6 +165,8 @@ unsigned int SimulationClass::field_index(string &s)
 		if (s == "deltaT")		return 10;
 		if (s == "deltaX")		return 11;
 		if (s == "deltaY")		return 12;
+		if (s == "sourceStartXY")return 13;
+		if (s == "sourceEndXY") return 14;
 
 		return 0;
 	

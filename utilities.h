@@ -16,6 +16,7 @@ int oneWayInternalArrayCopy(double *originArray, double *destArray, ArraySectorC
 //Copy data between two arrays
 int twoWayInternalArrayCopy(double *array1, double *array2, int array1SizeX, int array2SizeX, ArraySectorClass array1send, ArraySectorClass array1recv, ArraySectorClass array2send, ArraySectorClass array2recv);
 int processRecievedData(); //Process all data recieves currently indicated in PhotonMPI.recievedData
+int setupSourceInChunks(); //Using input data for source, set-up source information in relevant chunks
 inline double* getDataPointerFromType(int gid, int dataType) //Get pointer to array in chunk based on data type
 {
 		switch (dataType)
