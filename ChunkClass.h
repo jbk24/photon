@@ -36,6 +36,7 @@ public:
 	int neighbor [4]; //GID of neighbor on each edge
 	ArraySectorClass ownEdge[4];//Locations of start and end point for each owned edge
 	ArraySectorClass overlapEdge[4]; //Locations of start and end points for each overlap edge
+	ArraySectorClass computeBounds; //Bounds on computation for FDTD, based on edge conditions
 	
 	//MPI DATA IO buffers
 	int numDataBuffers; //Number of data buffers

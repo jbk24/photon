@@ -63,6 +63,34 @@ void updateChunkList() //Update list of chunks owned by current processor
 				for(int k = 0; k<4; k++)
 				{
 					ChunkMap[curGid].edge[k] = getChunkEdgeConditions(curGid, ChunkMap[curGid].neighbor[k]);
+					
+					switch(k) //Determine compute bounds from edge conditions, for use in FDTD loop
+					{
+						case 0: //negative-x edge
+							if (!ChunkMap[curGid].edge[k]) //Test if edge is PEC
+								ChunkMap[curGid].computeBounds.start.x = 2;
+							else
+								ChunkMap[curGid].computeBounds.start.x = 1;
+							break;
+						case 1: //positive-x edge
+							if (!ChunkMap[curGid].edge[k]) //Test if edge is PEC
+								ChunkMap[curGid].computeBounds.end.x = ChunkMap[curGid].arraySize.x - 2;
+							else
+								ChunkMap[curGid].computeBounds.end.x = ChunkMap[curGid].arraySize.x - 1;
+							break;
+						case 2: //negative-y edge
+							if (!ChunkMap[curGid].edge[k]) //Test if edge is PEC
+								ChunkMap[curGid].computeBounds.start.y = 2;
+							else
+								ChunkMap[curGid].computeBounds.start.y = 1;
+							break;
+						case 3: //positive-y edge
+							if (!ChunkMap[curGid].edge[k]) //Test if edge is PEC
+								ChunkMap[curGid].computeBounds.end.y = ChunkMap[curGid].arraySize.y - 2;
+							else
+								ChunkMap[curGid].computeBounds.end.y = ChunkMap[curGid].arraySize.y - 1;
+							break;
+					}
 				}
 			}
 		}

@@ -4,7 +4,7 @@ This file contians the field calculations to support the FDTD timestepping.
 \*************************************************************************/
 
 #include "loop_over_chunks.h"
-#inclue <vector>
+#include <vector>
 
 //Update the E-field from the H-field
 int update_E_from_H()
@@ -12,12 +12,40 @@ int update_E_from_H()
 	//Initalize MPI comm system
 	PhotonMPI.chunkCommInit();
 	
+	//Loop over owned chunks
 	for(int g = 0; g<Simulation.ownedChunkList.size(); g++)
 	{
 		//Get gid for current chunk
 		unsigned int gid = Simulation.ownedChunkList.at(g);
 		
-		//Get pointers to data
+		//Get pointers to data to simplify code below
+		double* Ezx = ChunkMap[gid].Ezx;
+		double* Ezy = ChunkMap[gid].Ezy;
+		double* Hx = ChunkMap[gid].Hx;
+		double* Hy = ChunkMap[gid].Hy;
+		
+		//Prefactors
+		double *PFA_Ezx = ChunkMap[gid].PFA_Ezx;
+		double *PFB_Ezx = ChunkMap[gid].PFB_Ezx;
+		double *PFA_Ezy = ChunkMap[gid].PFA_Ezy;
+		double *PFB_Ezy = ChunkMap[gid].PFB_Ezy;
+		
+		//Loop over array, as defined by compute bounds
+		for(unsigned int x = ChunkMap[gid].computeBounds.start.x; x < ChunkMap[gid].computeBounds.end.x; x++)
+		{
+			for(unsigned int y = ChunkMap[gid].computeBounds.start.y; y < ChunkMap[gid].computeBounds.end.y; y++)
+			{
+			
+				unsigned int p = xy2gid(x,y,ChunkMap[gid].arraySize.x); //Current point (i+1/2, j+1/2) for H
+				unsigned int px = xy2gid(x-1,y,ChunkMap[gid].arraySize.x); //i-1/2 point, for derivative
+				unsigned int py = xy2gid(x,y-1,ChunkMap[gid].arraySize.x); //j-1/2 point, for derivative
+				
+				Ezx[p] = Ezx[p]*PFA_Ezx[p] + PFB_Ezx[p]*(Hy[p]-Hy[px]);
+				Ezy[p] = Ezy[p]*PFA_Ezy[p] + PFB_Ezy[p]*(Hx[p]-Hx[py]);
+			}
+		}
+		//Send newly computed data associated with current chunk
+		E_updateComm(gid);
 	}
 
 	//Wait on sends and recieves
@@ -35,6 +63,42 @@ int update_H_from_E()
 	//Initalize MPI comm system
 	PhotonMPI.chunkCommInit();
 	
+	
+	//Loop over owned chunks
+	for(int g = 0; g<Simulation.ownedChunkList.size(); g++)
+	{
+		//Get gid for current chunk
+		unsigned int gid = Simulation.ownedChunkList.at(g);
+		
+		//Get pointers to data to simplify code below
+		double* Ezx = ChunkMap[gid].Ezx;
+		double* Ezy = ChunkMap[gid].Ezy;
+		double* Hx = ChunkMap[gid].Hx;
+		double* Hy = ChunkMap[gid].Hy;
+		
+		//Prefactors
+		double *PFA_Hx = ChunkMap[gid].PFA_Hx;
+		double *PFB_Hx = ChunkMap[gid].PFB_Hx;
+		double *PFA_Hy = ChunkMap[gid].PFA_Hy;
+		double *PFB_Hy = ChunkMap[gid].PFB_Hy;
+		
+		//Loop over array, as defined by compute bounds
+		for(unsigned int x = ChunkMap[gid].computeBounds.start.x; x < ChunkMap[gid].computeBounds.end.x; x++)
+		{
+			for(unsigned int y = ChunkMap[gid].computeBounds.start.y; y < ChunkMap[gid].computeBounds.end.y; y++)
+			{
+			
+				unsigned int p = xy2gid(x,y,ChunkMap[gid].arraySize.x); //Current point (i+1/2, j+1/2) for H
+				unsigned int px = xy2gid(x+1,y,ChunkMap[gid].arraySize.x); //i+1 point, for derivative
+				unsigned int py = xy2gid(x,y+1,ChunkMap[gid].arraySize.x); //j+1 point, for derivative
+				
+				Hx[p] = Hx[p]*PFA_Hx[p] - PFB_Hx[p]*(Ezx[py]-Ezx[p]+Ezy[py]-Ezy[p]);
+				Hy[p] = Hy[p]*PFA_Hy[p] - PFB_Hy[p]*(Ezx[px]-Ezx[p]+Ezy[px]-Ezx[p]);
+			}
+		}
+		//Send newly computed data associated with current chunk
+		H_updateComm(gid);
+	}
 	
 	//Wait on sends and recieves
 	PhotonMPI.chunkCommWait();

@@ -14,6 +14,8 @@ OBJECTS= \
 	global.o \
 	utilities.o \
 	csvFileIO.o \
+	FDTD.o \
+	loop_over_chunks.o \
 
 CPP=mpicc
 CPPFLAGS=-O2 -I$(MPIHOME)/include -I$(MPIDIR)
