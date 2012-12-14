@@ -1,0 +1,10 @@
+#PBS -N photon
+#PBS -l nodes4:ppn=1
+#PBS -l mem=4gb
+#PBS -l walltime=00:10:00
+#PBS -q eceforce-6
+#PBS -o data/simulation/photon
+#PBS -e data/simulation/photon
+
+mpirun -np 4 ./photon /nv/hp20/jkeilman3/data/photon/input.txt
+
