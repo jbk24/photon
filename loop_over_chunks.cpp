@@ -5,6 +5,7 @@ This file contians the field calculations to support the FDTD timestepping.
 
 #include "loop_over_chunks.h"
 #include <vector>
+#include "math.h"
 
 //Update the E-field from the H-field
 int update_E_from_H()
@@ -41,17 +42,16 @@ int update_E_from_H()
 				unsigned int py = xy2gid(x,y-1,ChunkMap[gid].arraySize.x); //j-1/2 point, for derivative
 				
 				Ezx[p] = Ezx[p]*PFA_Ezx[p] + PFB_Ezx[p]*(Hy[p]-Hy[px]);
-				Ezy[p] = Ezy[p]*PFA_Ezy[p] + PFB_Ezy[p]*(Hx[p]-Hx[py]);
+				Ezy[p] = Ezy[p]*PFA_Ezy[p] - PFB_Ezy[p]*(Hx[p]-Hx[py]);
 			}
 		}
 		
-		//TEMPORARY: Source
-		if( gid == 27)
+		/*if(ChunkMap[gid].sourceFlag) //Source present in current chunk, update Ezx and Ezy to reflect this
 		{
-			Ezx[xy2gid(100,10,ChunkMap[gid].arraySize.x)] = .5;
-			Ezy[xy2gid(100,10,ChunkMap[gid].arraySize.x)] = .5;
+
+			gaussianEzSource(gid);
 		}
-		
+		*/
 		//Send newly computed data associated with current chunk
 		E_updateComm(gid);
 	}
@@ -100,7 +100,7 @@ int update_H_from_E()
 				unsigned int py = xy2gid(x,y+1,ChunkMap[gid].arraySize.x); //j+1 point, for derivative
 				
 				Hx[p] = Hx[p]*PFA_Hx[p] - PFB_Hx[p]*(Ezx[py]-Ezx[p]+Ezy[py]-Ezy[p]);
-				Hy[p] = Hy[p]*PFA_Hy[p] - PFB_Hy[p]*(Ezx[px]-Ezx[p]+Ezy[px]-Ezy[p]);
+				Hy[p] = Hy[p]*PFA_Hy[p] + PFB_Hy[p]*(Ezx[px]-Ezx[p]+Ezy[px]-Ezy[p]);
 			}
 		}
 		//Send newly computed data associated with current chunk
@@ -232,3 +232,27 @@ int H_updateComm(unsigned int gid)
 		}
 	return 0;
 }
+
+int gaussianEzSource(int gid)
+{
+	//Get current source value
+	double sourceVal = gaussianValue();
+	
+	//Loop over source region to add in source
+	for(int x = ChunkMap[gid].source.start.x; x <= ChunkMap[gid].source.end.x; x++)
+	{
+		for(int y = ChunkMap[gid].source.start.y; y <= ChunkMap[gid].source.end.y; y++)
+		{
+			ChunkMap[gid].Ezx[xy2gid(x,y,ChunkMap[gid].arraySize.x)] += sourceVal;
+			ChunkMap[gid].Ezy[xy2gid(x,y,ChunkMap[gid].arraySize.x)] += sourceVal;
+		}
+	}
+	
+	return 0;
+}
+
+double gaussianValue()
+{
+	return exp(-1*pow(((Simulation.curT-Simulation.n0)/Simulation.nDecay),2));
+}
+

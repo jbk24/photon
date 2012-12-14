@@ -16,6 +16,8 @@ OBJECTS= \
 	csvFileIO.o \
 	FDTD.o \
 	loop_over_chunks.o \
+	timer.o \
+
 
 CPP=mpicc
 CPPFLAGS=-O2 -I$(MPIHOME)/include -I$(MPIDIR)

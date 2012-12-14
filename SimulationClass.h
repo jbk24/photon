@@ -43,8 +43,10 @@ public:
 	double deltaY; //delta Y for timestepping
 	
 	//Source properties
-	double freq;
 	ArraySectorClass sourceLocation; //Specify start (x,y) and end (x,y) for source region
+	double n0; //Center time for gaussian source
+	double nDecay; //Decay width of gaussian
+	double freq; //For future implementation of CW source
 	
 	//Functions
 	

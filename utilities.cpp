@@ -334,8 +334,41 @@ int processRecievedData() //Process all data recieves currently indicated in Pho
 
 int setupSourceInChunks() //Using input data for source, set-up source information in relevant chunks
 {
-	//Loop across specified source region
 	
+	//Loop across specified source region
+	for(int x = Simulation.sourceLocation.start.x; x <= Simulation.sourceLocation.end.x; x++)
+	{
+		for(int y = Simulation.sourceLocation.start.y; y <= Simulation.sourceLocation.end.y; y++)
+		{
+				//Determine what chunk this point resides in
+				int chunkX = x/Simulation.chunkSize.x;
+				int chunkY = y/Simulation.chunkSize.y;
+				int gid = xy2gid(chunkX,chunkY, Simulation.numChunks.x);
+
+				
+				//See if this is the first point for this chunk
+				if(!ChunkMap[gid].sourceFlag)
+				{
+					//Set sourceFlag to indicate presence of source
+					ChunkMap[gid].sourceFlag = true;
+					//First point in chunk, set start point
+					int locX = x%Simulation.chunkSize.x + 1; //Arrays are padded
+					int locY = y%Simulation.chunkSize.y + 1; //Arrays are padded
+				
+					ChunkMap[gid].source.start.x = locX;
+					ChunkMap[gid].source.start.y = locY;
+					cout << "Source in: " << gid << endl;
+				}
+				else //Set end point, keep updating until we leave the chunk
+				{
+					int locX = x%Simulation.chunkSize.x + 1; //Arrays are padded
+					int locY = y%Simulation.chunkSize.y + 1; //Arrays are padded
+					
+					ChunkMap[gid].source.end.x = locX;
+					ChunkMap[gid].source.end.y = locY;
+				}
+		}
+	}	
 	
 	return 0;
 }

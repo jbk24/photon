@@ -15,6 +15,11 @@ public:
 	int processor; //Rank of processor that currently owns chunk--will change under adaptive grid
 	int refinement; //Integer indicating refinement level. Current dimesnions are original dimensions multiplied by refinement
 	
+	//Source
+	bool sourceFlag; //Indicates a source region exists in this chunk
+	ArraySectorClass source; //Location of source in chunk
+	//int sourceType; //Future implementation of different types of sources
+	
 	//Edge conditions:
 	// 0 = PEC boundary (edge of computational domain, no comm)
 	// 1 = internal comm, matched refinement

@@ -12,8 +12,7 @@ int instantiateChunkMap()
 {
 	//Instantiate array of ChunkClass of size xChunks by yChunks
 	ChunkMap = new ChunkClass[Simulation.numChunks.x*Simulation.numChunks.y];
-	printf("\n%u\n",ChunkMap[3].refinement);
-	
+
 	//Initialize chunkMap by defining chunk neighbors
 	initializeChunkMap();
 

@@ -31,6 +31,9 @@ ChunkClass::ChunkClass()
 	//Initalize edge bounds
 	initalizeEdgeBounds();
 	
+	//Default to no source
+	sourceFlag = false;
+	
 	//Number of MPI send and recieve data buffers
 	numDataBuffers = 20;
 
@@ -167,6 +170,7 @@ int ChunkClass::computePrefactors() //Compute FDTD timestepping prefactors from 
 	double dY = Simulation.deltaY/refinement;
 	double mu = 0.00000125663; //u0, placeholder for future inclusion of magnetic materials (4*pi*10^-7 H/m)
 	double epsXavg, sigXavg, epsYavg, sigYavg; // Used to compute averages for H prefactors
+
 	
 	//Loop over interior of arrays
 	for(int x = 1; x<(arraySize.x-1); x++)

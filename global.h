@@ -4,6 +4,7 @@
 #include "SimulationClass.h"
 #include "PhotonMPIClass.h"
 #include "ChunkClass.h"
+#include "timer.hpp" //From Merat
 
 extern PhotonMPIClass PhotonMPI;
 extern SimulationClass Simulation;

@@ -22,11 +22,12 @@
 	for(Simulation.curT = 0; Simulation.curT<Simulation.maxT; Simulation.curT++)
 	{
 
-		cout << "On timestep: " << Simulation.curT << endl;
+		if(PhotonMPI.rank == 0) //Print timestep if rank 0
+			cout << "On timestep: " << Simulation.curT << endl;
 		
 		//Update E field from H field at curT
 		update_E_from_H();
-	
+
 	 
 		//Update H field from E field at curT + 1/2
 		update_H_from_E();
