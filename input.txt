@@ -2,9 +2,9 @@ name: test_simulation
 dir: C:/Simulation_Directory/simulation
 maxRes: 64
 minRes: 32
-chunkSize: (5,4)
-cellGlobal: (60,40)
-maxT: 50
+chunkSize: (128,128)
+cellGlobal: (1024,1024)
+maxT: 10
 freq: 32.5
 processors: (2,2)
 deltaT: 3.33e-15

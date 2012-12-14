@@ -69,6 +69,7 @@ void ChunkClass::allocateArrays() //Allocate arrays for chunk
 	PFA_Hy = new double[size]();
 	PFB_Hy = new double[size]();
 	
+	
 	//Allocate data buffers for MPI IO
 	//Nominally internal chunks don't need these, but under AMR, internal chunks may end up with external boundaries, and the memory for data buffers is small when compared
 	//with total chunk memory
@@ -164,7 +165,7 @@ int ChunkClass::computePrefactors() //Compute FDTD timestepping prefactors from 
 	double dT = Simulation.deltaT/refinement;
 	double dX = Simulation.deltaX/refinement;
 	double dY = Simulation.deltaY/refinement;
-	double mu = 1; //Placeholder for future inclusion of magnetic materials
+	double mu = 0.00000125663; //u0, placeholder for future inclusion of magnetic materials (4*pi*10^-7 H/m)
 	double epsXavg, sigXavg, epsYavg, sigYavg; // Used to compute averages for H prefactors
 	
 	//Loop over interior of arrays

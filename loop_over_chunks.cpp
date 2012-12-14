@@ -44,6 +44,14 @@ int update_E_from_H()
 				Ezy[p] = Ezy[p]*PFA_Ezy[p] + PFB_Ezy[p]*(Hx[p]-Hx[py]);
 			}
 		}
+		
+		//TEMPORARY: Source
+		if( gid == 27)
+		{
+			Ezx[xy2gid(100,10,ChunkMap[gid].arraySize.x)] = .5;
+			Ezy[xy2gid(100,10,ChunkMap[gid].arraySize.x)] = .5;
+		}
+		
 		//Send newly computed data associated with current chunk
 		E_updateComm(gid);
 	}

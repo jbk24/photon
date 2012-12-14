@@ -266,6 +266,12 @@ int writeAllChunkstoCSV(int dataType) //Write arrays in all owned chunks to file
 				filename = filenameStream.str();
 				writeArraytoCSV(ChunkMap[gid].Hy, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
 				break;
+			
+			case 7: //PFA_Ezx
+				filenameStream << "Chunk " << gid << " PFA_Ezx.csv";
+				filename = filenameStream.str();
+				writeArraytoCSV(ChunkMap[gid].PFA_Ezx, ChunkMap[gid].arraySize.x, ChunkMap[gid].arraySize.y, filename );
+				break;
 		
 		}
 		

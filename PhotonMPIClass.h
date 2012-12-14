@@ -44,7 +44,6 @@ public:
 	vector<RecvDataClass> recievedData; //List of all data being recived in current MPI cycle
 	
 	
-	
 	//Functions
 	int initialize(int argc, char *argv[]); //Initialize MPI system, call once at beginning
 	int finalize(); //Terminates MPI system, other MPI cleanup, call once at end

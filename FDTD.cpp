@@ -9,6 +9,15 @@
  int FDTD_timestep()
  {
 	
+	 //Compute prefactors by looping over owned chunks
+	 for(int g = 0; g<Simulation.ownedChunkList.size(); g++)
+	 {
+		 //Get gid for current chunk
+		unsigned int gid = Simulation.ownedChunkList.at(g);
+		
+		ChunkMap[gid].computePrefactors();
+	 }
+	 
  //Timestepping
 	for(Simulation.curT = 0; Simulation.curT<Simulation.maxT; Simulation.curT++)
 	{

@@ -4,6 +4,8 @@
 #include "global.h"
 #include "utilities.h"
 #include "csvFileIO.h"
+#include "FDTD.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -36,10 +38,12 @@ int main(int argc, char *argv[])
 	if(epsilonSigmaOverlap())
 		cout << "Problem overlapping epsilon and sigma data." << endl;
 	
+	
 	//Call FDTD
-//	FDTD_timestep();
+	FDTD_timestep();
 	
-	
+	//Write all PFA_Ezx chunks to file
+	writeAllChunkstoCSV(7);
 	
 	//Write all epsilon chunks to file
 	writeAllChunkstoCSV(0);
