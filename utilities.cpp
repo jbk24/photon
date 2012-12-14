@@ -341,6 +341,7 @@ int setupSourceInChunks() //Using input data for source, set-up source informati
 		for(int y = Simulation.sourceLocation.start.y; y <= Simulation.sourceLocation.end.y; y++)
 		{
 				//Determine what chunk this point resides in
+				//cout << "Chunk Size: (" << Simulation.chunkSize.x << "," << Simulation.chunkSize.y << ")" << endl;
 				int chunkX = x/Simulation.chunkSize.x;
 				int chunkY = y/Simulation.chunkSize.y;
 				int gid = xy2gid(chunkX,chunkY, Simulation.numChunks.x);
@@ -357,7 +358,7 @@ int setupSourceInChunks() //Using input data for source, set-up source informati
 				
 					ChunkMap[gid].source.start.x = locX;
 					ChunkMap[gid].source.start.y = locY;
-					//cout << "Source in: " << gid << endl;
+					cout << "Source in: " << gid << endl;
 				}
 				else //Set end point, keep updating until we leave the chunk
 				{

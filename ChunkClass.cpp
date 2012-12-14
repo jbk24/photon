@@ -35,7 +35,7 @@ ChunkClass::ChunkClass()
 	sourceFlag = false;
 	
 	//Number of MPI send and recieve data buffers
-	numDataBuffers = 20;
+	numDataBuffers = 15;
 
 }
 

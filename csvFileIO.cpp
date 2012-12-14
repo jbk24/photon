@@ -162,9 +162,22 @@ int writeChunkMapCSV()
 {
 
 	//Open files
-	ofstream procMap ("ChunkMapProcessors.csv"); //Map of grid chunk processors
-	ofstream gidMap ("ChunkMapGID.csv");
-	ofstream refineMap ("ChunkMapRefinement.csv"); //Map of grid chunk refinement
+
+	stringstream filenameStream;
+	filenameStream.clear();
+	filenameStream.str("");
+	filenameStream << Simulation.dir << "ChunkMapProcessors.csv";
+	ofstream procMap (filenameStream.str().c_str()); //Map of grid chunk processors
+	
+	filenameStream.clear();
+	filenameStream.str("");
+	filenameStream << Simulation.dir << "ChunkMapGID.csv";
+	ofstream gidMap (filenameStream.str().c_str());
+	
+	filenameStream.clear();
+	filenameStream.str("");
+	filenameStream << Simulation.dir << "ChunkMapRefinement.csv";
+	ofstream refineMap (filenameStream.str().c_str()); //Map of grid chunk refinement
 	
 	//Check if files are open
 	if(procMap.is_open() && gidMap.is_open() && refineMap.is_open())
