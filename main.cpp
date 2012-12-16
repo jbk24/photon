@@ -50,13 +50,13 @@ int main(int argc, char *argv[])
 	
 	
 	//Write all PFA_Ezx chunks to file
-	writeAllChunkstoCSV(8);
+	//writeAllChunkstoCSV(8);
 	
 	//Write all epsilon chunks to file
 	writeAllChunkstoCSV(0);
 	
 	//Write all Ezx chunks to file
-	writeAllChunkstoCSV(3);
+	//writeAllChunkstoCSV(3);
 	
 	//Perform global cleanup
 	globalCleanUp();
